@@ -16,9 +16,18 @@ export const AvatarProvider = ({ children }) => {
   // Initial load and listen for updates
   useEffect(() => {
     const loadAvatar = () => {
-      const currentUser = JSON.parse(localStorage.getItem('lightledger_session') || '{}')
-      if (currentUser.username) {
-        const savedAvatar = localStorage.getItem(`lightledger_avatar_${currentUser.username}`)
+      const session = localStorage.getItem('lightledger_session')
+      let username = null
+      if (session) {
+        try {
+          const parsed = JSON.parse(session)
+          username = parsed.username || parsed
+        } catch {
+          username = session
+        }
+      }
+      if (username) {
+        const savedAvatar = localStorage.getItem(`lightledger_avatar_${username}`)
         setAvatar(savedAvatar || null)
       }
     }

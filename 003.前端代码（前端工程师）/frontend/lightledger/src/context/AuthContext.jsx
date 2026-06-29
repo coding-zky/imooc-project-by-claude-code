@@ -17,21 +17,29 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('lightledger_token')
-    const username = localStorage.getItem('lightledger_session')
-    if (token && username) {
-      setUser({ username })
+    const session = localStorage.getItem('lightledger_session')
+    if (token && session) {
+      let username = null
+      try {
+        const parsed = JSON.parse(session)
+        username = parsed.username || parsed
+      } catch {
+        username = session
+      }
+      if (username) setUser({ username })
     }
     setLoading(false)
   }, [])
 
   const login = (username) => {
-    localStorage.setItem('lightledger_session', username)
+    localStorage.setItem('lightledger_session', JSON.stringify({ username }))
     setUser({ username })
   }
 
   const logout = () => {
     localStorage.removeItem('lightledger_token')
     localStorage.removeItem('lightledger_session')
+    window.dispatchEvent(new Event('avatar-updated'))
     setUser(null)
   }
 
