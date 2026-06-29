@@ -1,0 +1,262 @@
+<!doctype html>
+<html class="light" lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>轻账本 - 统计报表</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8f9fa;
+      }
+      .chart-container {
+        position: relative;
+      }
+      /* Custom Tooltip Styling */
+      .chart-tooltip {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      .group:hover .chart-tooltip {
+        opacity: 1;
+      }
+      /* Active Scale Micro-interaction */
+      .btn-press:active {
+        transform: scale(0.95);
+      }
+    </style>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#c3c6d7",
+              "text-secondary": "#6B7280",
+              "text-primary": "#111827",
+              background: "#f8f9fa",
+              primary: "#004ac6",
+              secondary: "#006c49",
+              surface: "#FFFFFF",
+              border: "#E5E7EB",
+              "primary-container": "#2563eb",
+              "on-surface": "#191c1d",
+              "on-surface-variant": "#434655",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              base: "4px",
+              xs: "8px",
+              xl: "32px",
+              "layout-margin": "24px",
+              "layout-gutter": "16px",
+              md: "16px",
+              sm: "12px",
+              lg: "24px",
+            },
+            fontFamily: {
+              "body-main": ["Inter"],
+              "display-title": ["Inter"],
+              "label-helper": ["Inter"],
+            },
+            fontSize: {
+              "body-main": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "display-title": [
+                "24px",
+                {
+                  lineHeight: "32px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "label-helper": [
+                "12px",
+                { lineHeight: "16px", fontWeight: "400" },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="antialiased bg-background text-text-primary">
+    <!-- TopNavBar -->
+    <header class="sticky top-0 z-50 border-b bg-surface border-border">
+      <div
+        class="flex justify-between items-center w-full px-layout-margin h-16 max-w-[1280px] mx-auto"
+      >
+        <div
+          class="font-semibold font-display-title text-display-title text-primary"
+        >
+          轻账本
+        </div>
+        <nav class="items-center hidden h-full space-x-8 md:flex">
+          <a
+            class="flex items-center h-full transition-colors text-text-secondary hover:text-text-primary font-body-main"
+            href="#"
+            >首页</a
+          >
+          <a
+            class="flex items-center h-full transition-colors text-text-secondary hover:text-text-primary font-body-main"
+            href="#"
+            >记录消费</a
+          >
+          <a
+            class="flex items-center h-full transition-colors text-text-secondary hover:text-text-primary font-body-main"
+            href="#"
+            >消费明细</a
+          >
+          <a
+            class="flex items-center h-full pb-0 font-semibold border-b-2 text-primary border-primary"
+            href="#"
+            >统计报表</a
+          >
+        </nav>
+        <div class="flex items-center space-x-4">
+          <button
+            class="p-2 transition-all duration-200 rounded-full hover:bg-surface-container-low btn-press"
+          >
+            <span class="material-symbols-outlined text-on-surface-variant"
+              >notifications</span
+            >
+          </button>
+          <div
+            class="flex items-center justify-center w-8 h-8 overflow-hidden border rounded-full bg-surface-container-highest border-border"
+          >
+            <img
+              class="object-cover w-full h-full"
+              data-alt="A professional high-quality studio portrait of a minimalist user avatar profile icon, featuring a clean neutral background, soft corporate lighting, and a modern aesthetic suitable for a high-end financial SaaS application. The lighting is balanced and crisp, maintaining the light-mode UI color palette."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuTimwnRNBVeW56gAcSb4CbtsCqNpwzOwnpgX2wIQceg0E4J3J8I7pWGNdzZpG-izj1shZBqie-ef-fFdRxSJ8BSvL43_Yl-S7EiX_U8RQXYFStVETTN8o_gkCRc-5ja0p0sM4vr7nOMfF4bAHzIyXAhX47b13ojzgn46Pke8Otcj0nVj13uuzy2UL6G5EW-sBwmhvUJ8za0p5uhAUCtjNQ7d3wMaPOkQOetgum9QqkHb4V67qCDwjy3ogYsacytdXLthPLf4J3Uy_"
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="max-w-[1280px] mx-auto px-layout-margin py-8">
+      <!-- Header & Filter Section -->
+      <div
+        class="flex flex-col justify-between gap-4 mb-8 md:flex-row md:items-end"
+      >
+        <div>
+          <h1
+            class="mb-1 font-display-title text-display-title text-text-primary"
+          >
+            统计报表
+          </h1>
+          <p class="text-text-secondary font-body-secondary">
+            洞察您的消费习惯，优化财务结构
+          </p>
+        </div>
+        <div
+          class="flex items-center p-1 border rounded-lg bg-surface border-border"
+        >
+          <button
+            class="px-4 py-1.5 rounded-md text-sm font-medium transition-all bg-primary text-white shadow-sm"
+          >
+            最近7天
+          </button>
+          <button
+            class="px-4 py-1.5 rounded-md text-sm font-medium transition-all text-text-secondary hover:bg-surface-container-low"
+          >
+            最近30天
+          </button>
+          <button
+            class="px-4 py-1.5 rounded-md text-sm font-medium transition-all text-text-secondary hover:bg-surface-container-low flex items-center gap-1"
+          >
+            自定义
+            <span class="material-symbols-outlined text-[16px]"
+              >calendar_today</span
+            >
+          </button>
+        </div>
+      </div>
+      <!-- Bento Grid Layout -->
+      <div class="grid grid-cols-12 gap-6">
+        <!-- Summary Card -->
+        <div
+          class="flex flex-col justify-between col-span-12 p-6 border md:col-span-4 bg-surface border-border rounded-xl"
+        >
+          <div>
+            <span
+              class="tracking-wider uppercase text-text-secondary text-label-helper font-label-helper"
+              >总支出 (CNY)</span
+            >
+            <h2 class="mt-2 text-3xl font-bold text-text-primary">
+              ¥ 12,480.00
+            </h2>
+            <div class="flex items-center gap-2 mt-2">
+              <span
+                class="flex items-center text-sm font-medium text-secondary"
+              >
+                <span class="material-symbols-outlined text-[18px]"
+                  >trending_down</span
+                >
+                12.5%
+              </span>
+              <span class="text-xs text-text-secondary">对比上个周期</span>
+            </div>
+          </div>
+          <div class="pt-6 mt-8 border-t border-border">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-text-secondary">日均消费</span>
+              <span class="font-semibold text-text-primary">¥ 1,782.85</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-text-secondary">单笔最高</span>
+              <span class="font-semibold text-text-primary text-error"
+                >¥ 4,200.00</span
+              >
+            </div>
+          </div>
+        </div>
+        <!-- Spending Trend Line Chart -->
+        <div
+          class="col-span-12 p-6 border md:col-span-8 bg-surface border-border rounded-xl"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="font-semibold text-text-primary">消费趋势分析</h3>
+            <span
+              class="cursor-pointer material-symbols-outlined text-text-secondary hover:text-primary"
+              >more_horiz</span
+            >
+          </div>
+          <div class="relative flex items-end justify-between h-64 px-2 pt-4">
+            <!-- Simulated Grid Lines -->
+            <div
+              class="absolute inset-x-0 bottom-0 flex flex-col justify-between pointer-events-none top-4"
+            >
+              <div class="w-full border-t border-dashed border-border"></div>
+              <div class="w-full border-t border-dashed border-border"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

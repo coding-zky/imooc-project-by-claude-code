@@ -1,0 +1,555 @@
+<!doctype html>
+<html class="light" lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#c3c6d7",
+              "text-secondary": "#6B7280",
+              "inverse-on-surface": "#f0f1f2",
+              "text-primary": "#111827",
+              background: "#f8f9fa",
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-surface": "#2e3132",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-bright": "#f8f9fa",
+              tertiary: "#784b00",
+              "error-container": "#ffdad6",
+              "tertiary-fixed": "#ffddb8",
+              "on-tertiary-container": "#ffeedd",
+              "on-secondary": "#ffffff",
+              error: "#EF4444",
+              "on-background": "#191c1d",
+              "surface-container-low": "#f3f4f5",
+              "on-primary-container": "#eeefff",
+              "inverse-primary": "#b4c5ff",
+              "on-secondary-fixed": "#002113",
+              "tertiary-container": "#996100",
+              primary: "#004ac6",
+              secondary: "#006c49",
+              outline: "#737686",
+              "on-secondary-container": "#00714d",
+              "on-primary": "#ffffff",
+              "on-surface": "#191c1d",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e1e3e4",
+              "on-secondary-fixed-variant": "#005236",
+              "surface-container": "#edeeef",
+              "on-primary-fixed-variant": "#003ea8",
+              "surface-container-high": "#e7e8e9",
+              "secondary-fixed-dim": "#4edea3",
+              "secondary-container": "#6cf8bb",
+              "secondary-fixed": "#6ffbbe",
+              "primary-container": "#2563eb",
+              "on-tertiary-fixed-variant": "#653e00",
+              "primary-hover": "#1D4ED8",
+              "surface-container-highest": "#e1e3e4",
+              "surface-tint": "#0053db",
+              "primary-fixed": "#dbe1ff",
+              "tertiary-fixed-dim": "#ffb95f",
+              border: "#E5E7EB",
+              "on-surface-variant": "#434655",
+              "on-primary-fixed": "#00174b",
+              surface: "#FFFFFF",
+              "surface-dim": "#d9dadb",
+              "primary-fixed-dim": "#b4c5ff",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              base: "4px",
+              xs: "8px",
+              xl: "32px",
+              "layout-margin": "24px",
+              "layout-gutter": "16px",
+              md: "16px",
+              sm: "12px",
+              lg: "24px",
+            },
+            fontFamily: {
+              "body-main": ["Inter"],
+              "display-title": ["Inter"],
+              "body-secondary": ["Inter"],
+              "display-title-mobile": ["Inter"],
+              "headline-card": ["Inter"],
+              "label-helper": ["Inter"],
+            },
+            fontSize: {
+              "body-main": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "display-title": [
+                "24px",
+                {
+                  lineHeight: "32px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-secondary": [
+                "14px",
+                { lineHeight: "20px", fontWeight: "400" },
+              ],
+              "display-title-mobile": [
+                "20px",
+                { lineHeight: "28px", fontWeight: "600" },
+              ],
+              "headline-card": [
+                "18px",
+                {
+                  lineHeight: "26px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              "label-helper": [
+                "12px",
+                { lineHeight: "16px", fontWeight: "400" },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: "Inter", sans-serif;
+        color: #111827;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e5e7eb;
+        border-radius: 10px;
+      }
+      .transaction-card:hover .delete-btn {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <!-- Top Navigation Bar -->
+    <header
+      class="fixed top-0 left-0 right-0 z-50 border-b bg-surface border-border"
+    >
+      <div
+        class="flex justify-between items-center w-full px-layout-margin h-16 max-w-[1280px] mx-auto"
+      >
+        <div
+          class="font-semibold font-display-title text-display-title text-primary"
+        >
+          轻账本
+        </div>
+        <nav class="items-center hidden space-x-8 md:flex">
+          <a
+            class="transition-colors text-text-secondary hover:text-text-primary font-body-main"
+            href="#"
+            >首页</a
+          >
+          <a
+            class="transition-colors text-text-secondary hover:text-text-primary font-body-main"
+            href="#"
+            >记录消费</a
+          >
+          <a
+            class="pb-2 font-semibold border-b-2 text-primary border-primary font-body-main"
+            href="#"
+            >消费明细</a
+          >
+          <a
+            class="transition-colors text-text-secondary hover:text-text-primary font-body-main"
+            href="#"
+            >统计报表</a
+          >
+        </nav>
+        <div class="flex items-center space-x-4">
+          <button
+            class="p-2 transition-all duration-200 rounded-full hover:bg-surface-container-low active:scale-95"
+          >
+            <span class="material-symbols-outlined text-on-surface"
+              >notifications</span
+            >
+          </button>
+          <button
+            class="p-1 transition-all duration-200 rounded-full hover:bg-surface-container-low active:scale-95"
+          >
+            <img
+              alt="用户头像"
+              class="w-8 h-8 border rounded-full border-border"
+              data-alt="A professional profile avatar of a young financial advisor in a minimalist office setting, soft natural lighting, high-end photography style, clean background, modern light-mode aesthetic."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcxkyt07ALMSW86SP4YmLe1NICC4r7P53Bs5WQ3NF4jSZ7mw8iVMoesMxZten4mj3zApryQsqBAj6GepiOKsECWsGddzC-uC04H7lUs0JRFv1K0sZUSrKPvVHa9dQ11HqYsY9qxx2F61mSdAIASEesj5tugTtzbL5Dk07CK8Y-F1f4qQ95gPWc-RsBsd_Dyk3iRqsU_tfjvQ9fTQt-K3p2iUHOxrvwOigKBaXnMxJz2TRbRUo9qLR2YP3Ihaao2Y8fetduyXEYcRoL"
+            />
+          </button>
+        </div>
+      </div>
+    </header>
+    <main class="pt-24 pb-12 px-layout-margin max-w-[1280px] mx-auto">
+      <!-- Header Section -->
+      <div
+        class="flex flex-col gap-6 mb-8 md:flex-row md:items-end md:justify-between"
+      >
+        <div>
+          <h1 class="mb-2 font-display-title text-display-title">消费明细</h1>
+          <p class="font-body-secondary text-text-secondary">
+            追踪每一笔资金流动，保持财务清晰。
+          </p>
+        </div>
+        <!-- Filter Bar -->
+        <div
+          class="flex flex-wrap items-center gap-3 p-2 border shadow-sm bg-surface rounded-xl border-border"
+        >
+          <div class="relative group">
+            <label
+              class="absolute px-1 -top-2 left-3 bg-surface font-label-helper text-label-helper text-text-secondary"
+              >月份</label
+            >
+            <div
+              class="flex items-center px-3 py-2 border border-border rounded-lg group-hover:border-primary transition-colors cursor-pointer min-w-[140px]"
+            >
+              <span class="mr-2 text-sm material-symbols-outlined text-primary"
+                >calendar_month</span
+              >
+              <span class="font-body-secondary">2026-06</span>
+              <span class="ml-auto text-sm material-symbols-outlined"
+                >expand_more</span
+              >
+            </div>
+          </div>
+          <div class="relative group">
+            <label
+              class="absolute px-1 -top-2 left-3 bg-surface font-label-helper text-label-helper text-text-secondary"
+              >分类</label
+            >
+            <div
+              class="flex items-center px-3 py-2 border border-border rounded-lg group-hover:border-primary transition-colors cursor-pointer min-w-[140px]"
+            >
+              <span class="mr-2 text-sm material-symbols-outlined text-primary"
+                >category</span
+              >
+              <span class="font-body-secondary">全部类别</span>
+              <span class="ml-auto text-sm material-symbols-outlined"
+                >expand_more</span
+              >
+            </div>
+          </div>
+          <button
+            class="flex items-center px-4 py-2 transition-colors border rounded-lg bg-surface border-border text-text-primary font-body-secondary hover:bg-surface-container-low active:scale-95"
+          >
+            <span class="mr-2 text-sm material-symbols-outlined"
+              >file_download</span
+            >
+            导出报表</button
+          ><button
+            class="flex items-center px-4 py-2 transition-colors rounded-lg bg-primary text-on-primary font-body-secondary hover:bg-primary-hover active:scale-95"
+          >
+            <span class="mr-2 text-sm material-symbols-outlined">search</span>
+            筛选
+          </button>
+        </div>
+      </div>
+      <!-- Transactions Container -->
+      <div class="space-y-12">
+        <!-- Date Group: 2026-06-15 -->
+        <section>
+          <div
+            class="flex items-center justify-between pb-2 mb-4 border-b border-border"
+          >
+            <h2 class="font-headline-card text-headline-card text-text-primary">
+              2026-06-15
+            </h2>
+            <span class="font-label-helper text-text-secondary"
+              >当日支出: ¥ 258.00</span
+            >
+          </div>
+          <div class="grid grid-cols-1 gap-4">
+            <!-- Item 1 -->
+            <div
+              class="flex items-center p-4 transition-all border transaction-card bg-surface border-border rounded-xl group hover:border-primary/30 hover:shadow-md"
+            >
+              <div
+                class="flex items-center justify-center w-12 h-12 mr-4 rounded-full bg-surface-container-low text-primary"
+              >
+                <span class="material-symbols-outlined">restaurant</span>
+              </div>
+              <div class="flex-grow">
+                <div class="font-semibold font-body-main text-text-primary">
+                  精品午餐
+                </div>
+                <div class="font-label-helper text-text-secondary">
+                  商场餐饮 · 12:30
+                </div>
+              </div>
+              <div class="mr-4 text-right">
+                <div class="font-headline-card text-error">- 88.00 元</div>
+                <div class="font-label-helper text-text-secondary">
+                  备注: 朋友聚餐
+                </div>
+              </div>
+              <button
+                class="p-2 transition-all duration-200 translate-x-2 opacity-0 delete-btn text-text-secondary hover:text-error"
+              >
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+            <!-- Item 2 -->
+            <div
+              class="flex items-center p-4 transition-all border transaction-card bg-surface border-border rounded-xl group hover:border-primary/30 hover:shadow-md"
+            >
+              <div
+                class="flex items-center justify-center w-12 h-12 mr-4 rounded-full bg-surface-container-low text-primary"
+              >
+                <span class="material-symbols-outlined">shopping_bag</span>
+              </div>
+              <div class="flex-grow">
+                <div class="font-semibold font-body-main text-text-primary">
+                  夏季T恤
+                </div>
+                <div class="font-label-helper text-text-secondary">
+                  购物 · 15:45
+                </div>
+              </div>
+              <div class="mr-4 text-right">
+                <div class="font-headline-card text-error">- 170.00 元</div>
+              </div>
+              <button
+                class="p-2 transition-all duration-200 translate-x-2 opacity-0 delete-btn text-text-secondary hover:text-error"
+              >
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>
+        </section>
+        <!-- Date Group: 2026-06-14 -->
+        <section>
+          <div
+            class="flex items-center justify-between pb-2 mb-4 border-b border-border"
+          >
+            <h2 class="font-headline-card text-headline-card text-text-primary">
+              2026-06-14
+            </h2>
+            <span class="font-label-helper text-text-secondary"
+              >当日支出: ¥ 42.50</span
+            >
+          </div>
+          <div class="grid grid-cols-1 gap-4">
+            <!-- Item 3 -->
+            <div
+              class="flex items-center p-4 transition-all border transaction-card bg-surface border-border rounded-xl group hover:border-primary/30 hover:shadow-md"
+            >
+              <div
+                class="flex items-center justify-center w-12 h-12 mr-4 rounded-full bg-surface-container-low text-primary"
+              >
+                <span class="material-symbols-outlined">directions_bus</span>
+              </div>
+              <div class="flex-grow">
+                <div class="font-semibold font-body-main text-text-primary">
+                  交通卡充值
+                </div>
+                <div class="font-label-helper text-text-secondary">
+                  交通 · 08:15
+                </div>
+              </div>
+              <div class="mr-4 text-right">
+                <div class="font-headline-card text-error">- 30.00 元</div>
+              </div>
+              <button
+                class="p-2 transition-all duration-200 translate-x-2 opacity-0 delete-btn text-text-secondary hover:text-error"
+              >
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+            <!-- Item 4 -->
+            <div
+              class="flex items-center p-4 transition-all border transaction-card bg-surface border-border rounded-xl group hover:border-primary/30 hover:shadow-md"
+            >
+              <div
+                class="flex items-center justify-center w-12 h-12 mr-4 rounded-full bg-surface-container-low text-primary"
+              >
+                <span class="material-symbols-outlined">local_cafe</span>
+              </div>
+              <div class="flex-grow">
+                <div class="font-semibold font-body-main text-text-primary">
+                  美式咖啡
+                </div>
+                <div class="font-label-helper text-text-secondary">
+                  饮品 · 14:20
+                </div>
+              </div>
+              <div class="mr-4 text-right">
+                <div class="font-headline-card text-error">- 12.50 元</div>
+                <div class="font-label-helper text-text-secondary">
+                  备注: 提神必备
+                </div>
+              </div>
+              <button
+                class="p-2 transition-all duration-200 translate-x-2 opacity-0 delete-btn text-text-secondary hover:text-error"
+              >
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>
+        </section>
+        <!-- Date Group: 2026-06-12 (Income Example) -->
+        <section>
+          <div
+            class="flex items-center justify-between pb-2 mb-4 border-b border-border"
+          >
+            <h2 class="font-headline-card text-headline-card text-text-primary">
+              2026-06-12
+            </h2>
+            <span class="font-label-helper text-text-secondary"
+              >当日收益: ¥ 5000.00</span
+            >
+          </div>
+          <div class="grid grid-cols-1 gap-4">
+            <div
+              class="flex items-center p-4 transition-all border transaction-card bg-surface border-border rounded-xl group hover:border-primary/30 hover:shadow-md"
+            >
+              <div
+                class="flex items-center justify-center w-12 h-12 mr-4 rounded-full bg-secondary-container/10 text-secondary"
+              >
+                <span class="material-symbols-outlined">payments</span>
+              </div>
+              <div class="flex-grow">
+                <div class="font-semibold font-body-main text-text-primary">
+                  月度工资
+                </div>
+                <div class="font-label-helper text-text-secondary">
+                  收入 · 10:00
+                </div>
+              </div>
+              <div class="mr-4 text-right">
+                <div class="font-headline-card text-secondary">
+                  + 5000.00 元
+                </div>
+                <div class="font-label-helper text-text-secondary">
+                  备注: 06月薪酬
+                </div>
+              </div>
+              <button
+                class="p-2 transition-all duration-200 translate-x-2 opacity-0 delete-btn text-text-secondary hover:text-error"
+              >
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+      <!-- Load More Section -->
+      <div class="flex justify-center mt-12">
+        <button
+          class="flex items-center px-8 py-3 transition-all duration-200 border rounded-full shadow-sm group bg-surface border-border hover:bg-surface-container-low active:scale-95"
+          id="load-more"
+        >
+          <span class="mr-2 font-body-main text-text-primary"
+            >加载更多记录</span
+          >
+          <span
+            class="transition-transform duration-500 material-symbols-outlined text-text-secondary group-hover:rotate-180"
+            >expand_more</span
+          >
+        </button>
+      </div>
+    </main>
+    <!-- FAB for adding new transaction -->
+    <button
+      class="fixed z-40 flex items-center justify-center transition-all duration-200 rounded-full shadow-lg bottom-8 right-8 w-14 h-14 bg-primary text-on-primary hover:scale-110 active:scale-95"
+    >
+      <span class="text-3xl material-symbols-outlined">add</span>
+    </button>
+    <!-- Footer or Mobile Bottom Nav -->
+    <footer
+      class="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around h-16 px-4 border-t md:hidden bg-surface border-border"
+    >
+      <button class="flex flex-col items-center text-text-secondary">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px]">首页</span>
+      </button>
+      <button class="flex flex-col items-center text-primary">
+        <span
+          class="material-symbols-outlined"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >list_alt</span
+        >
+        <span class="text-[10px]">明细</span>
+      </button>
+      <div
+        class="flex items-center justify-center w-12 h-12 mb-8 border-4 rounded-full bg-primary border-background text-on-primary"
+      >
+        <span class="material-symbols-outlined">add</span>
+      </div>
+      <button class="flex flex-col items-center text-text-secondary">
+        <span class="material-symbols-outlined">leaderboard</span>
+        <span class="text-[10px]">报表</span>
+      </button>
+      <button class="flex flex-col items-center text-text-secondary">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-[10px]">我的</span>
+      </button>
+    </footer>
+    <script>
+      // Simple micro-interaction for Delete button
+      document.querySelectorAll(".delete-btn").forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          if (confirm("确定要删除这笔记录吗？")) {
+            const card = this.closest(".transaction-card");
+            card.style.opacity = "0";
+            card.style.transform = "scale(0.95)";
+            setTimeout(() => {
+              card.remove();
+            }, 300);
+          }
+        });
+      });
+
+      // Load More simulation
+      const loadMoreBtn = document.getElementById("load-more");
+      loadMoreBtn.addEventListener("click", function () {
+        const originalText = this.querySelector("span:first-child").innerText;
+        this.querySelector("span:first-child").innerText = "正在加载...";
+        this.classList.add("pointer-events-none", "opacity-70");
+
+        setTimeout(() => {
+          this.querySelector("span:first-child").innerText = originalText;
+          this.classList.remove("pointer-events-none", "opacity-70");
+          // Normally we'd append items here
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

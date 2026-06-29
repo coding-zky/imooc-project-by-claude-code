@@ -1,0 +1,284 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c3c6d7",
+                        "text-secondary": "#6B7280",
+                        "inverse-on-surface": "#f0f1f2",
+                        "text-primary": "#111827",
+                        "background": "#f8f9fa",
+                        "on-tertiary-fixed": "#2a1700",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary": "#784b00",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-tertiary-container": "#ffeedd",
+                        "on-secondary": "#ffffff",
+                        "error": "#EF4444",
+                        "on-background": "#191c1d",
+                        "surface-container-low": "#f3f4f5",
+                        "on-primary-container": "#eeefff",
+                        "inverse-primary": "#b4c5ff",
+                        "on-secondary-fixed": "#002113",
+                        "tertiary-container": "#996100",
+                        "primary": "#004ac6",
+                        "secondary": "#006c49",
+                        "outline": "#737686",
+                        "on-secondary-container": "#00714d",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container": "#edeeef",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-tint": "#0053db",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "border": "#E5E7EB",
+                        "on-surface-variant": "#434655",
+                        "on-primary-fixed": "#00174b",
+                        "surface": "#FFFFFF",
+                        "surface-dim": "#d9dadb",
+                        "primary-fixed-dim": "#b4c5ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "xs": "8px",
+                        "xl": "32px",
+                        "layout-margin": "24px",
+                        "layout-gutter": "16px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-main": ["Inter"],
+                        "display-title": ["Inter"],
+                        "body-secondary": ["Inter"],
+                        "display-title-mobile": ["Inter"],
+                        "headline-card": ["Inter"],
+                        "label-helper": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-main": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-secondary": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-title-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-card": ["18px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-helper": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #111827;
+        }
+        .form-container {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        .nav-active {
+            color: #004ac6;
+            border-bottom: 2px solid #004ac6;
+            padding-bottom: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="font-body-main text-body-main selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Bar -->
+<header class="bg-surface sticky top-0 z-50 border-b border-border">
+<div class="flex justify-between items-center w-full px-layout-margin h-16 max-w-[1280px] mx-auto">
+<div class="font-display-title text-display-title font-semibold text-primary">轻账本</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a class="text-text-secondary hover:text-text-primary transition-colors" href="#">首页</a>
+<a class="text-primary border-b-2 border-primary pb-2 font-semibold" href="#">记录消费</a>
+<a class="text-text-secondary hover:text-text-primary transition-colors" href="#">消费明细</a>
+<a class="text-text-secondary hover:text-text-primary transition-colors" href="#">统计报表</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional and clean studio headshot of a person for a user profile avatar. The background is a soft, neutral gray, emphasizing the person's friendly and approachable expression. The lighting is balanced and professional, creating a polished, modern aesthetic that fits a high-end financial application's UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAf9Yca_soe1uZYl6IlMOt_OkK_NHEmZmce00edCu8FiPsoC-8uCYVXDPK4Wm0tPUEFTim1qdGjFa_ATpe02rxZOg1_4H_jS8edoMVSnVr7CCVaeI4G0cTTItyIeH5hq9ftLYMzEK4tts0JMUVEcak8oaqxF6ME7AC1RbtMyEerHIQs67v5raK3HA950csM9tTioKXI350DclejUrE2SWaTA-pzdpjYWRj1_xnBBguGzp8gwO1NKZ1k4ajvaWuH2fr_ftsyjc1FLh1">
+</div>
+</div>
+</div>
+</header>
+<main class="min-h-[calc(100vh-64px)] py-12 px-layout-margin">
+<div class="form-container">
+<!-- Breadcrumb / Context -->
+<div class="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+<h1 class="font-display-title text-display-title text-text-primary mb-2">添加新账目</h1>
+<p class="text-text-secondary font-body-secondary">简单几步，理清您的每一笔开支。</p>
+</div>
+<!-- Record Form Card -->
+<div class="bg-surface rounded-xl border border-border p-8 md:p-10 transition-all duration-300">
+<form class="space-y-8" id="recordForm">
+<!-- Amount Input -->
+<div class="space-y-3">
+<label class="font-label-helper text-label-helper text-text-secondary block uppercase tracking-wider">账目金额 (元)</label>
+<div class="relative group">
+<span class="absolute left-0 top-1/2 -translate-y-1/2 text-4xl font-semibold text-text-primary">¥</span>
+<input class="w-full pl-10 py-4 text-5xl font-bold text-text-primary bg-transparent border-b-2 border-border focus:border-primary focus:ring-0 transition-all placeholder:text-surface-container-highest appearance-none" placeholder="0.00" required="" step="0.01" type="number">
+</div>
+</div>
+<!-- Category Selection -->
+<div class="space-y-3">
+<label class="font-label-helper text-label-helper text-text-secondary block uppercase tracking-wider">消费类别</label>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+<button class="category-btn flex items-center gap-2 p-3 border border-border rounded-lg hover:bg-surface-container-low transition-all active:scale-95 text-body-secondary bg-surface-container-lowest" data-category="dining" type="button">
+<span class="">🍜</span>餐饮
+                            </button>
+<button class="category-btn flex items-center gap-2 p-3 border border-border rounded-lg hover:bg-surface-container-low transition-all active:scale-95 text-body-secondary" data-category="transport" type="button">
+<span class="">🚗</span>交通
+                            </button>
+<button class="category-btn flex items-center gap-2 p-3 border border-border rounded-lg hover:bg-surface-container-low transition-all active:scale-95 text-body-secondary" data-category="shopping" type="button">
+<span class="">🛒</span>购物
+                            </button>
+<button class="category-btn flex items-center gap-2 p-3 border border-border rounded-lg hover:bg-surface-container-low transition-all active:scale-95 text-body-secondary" data-category="entertainment" type="button">
+<span class="">🎮</span>娱乐
+                            </button>
+<button class="category-btn flex items-center gap-2 p-3 border border-border rounded-lg hover:bg-surface-container-low transition-all active:scale-95 text-body-secondary" data-category="housing" type="button">
+<span class="">🏠</span>住房
+                            </button>
+<button class="category-btn flex items-center gap-2 p-3 border border-border rounded-lg hover:bg-surface-container-low transition-all active:scale-95 text-body-secondary" data-category="medical" type="button">
+<span class="">💊</span>医疗
+                            </button>
+</div>
+<!-- Dropdown for more options -->
+<div class="relative">
+<select class="w-full mt-2 p-3 rounded-lg border-border text-body-secondary focus:border-primary focus:ring-primary/10 bg-surface">
+<option disabled="" selected="" value="">选择更多分类...</option>
+<option value="education">📚 教育</option>
+<option value="communication">📱 通讯</option>
+<option value="social">🎁 社交</option>
+<option value="others">📌 其他</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Date Picker -->
+<div class="space-y-3">
+<label class="font-label-helper text-label-helper text-text-secondary block uppercase tracking-wider">日期</label>
+<div class="relative">
+<input class="w-full p-3 rounded-lg border border-border focus:border-primary focus:ring-primary/10 transition-all text-body-secondary" id="datePicker" required="" type="date">
+</div>
+</div>
+<!-- Notes (Optional) -->
+<div class="space-y-3">
+<label class="font-label-helper text-label-helper text-text-secondary block uppercase tracking-wider">备注 (可选)</label>
+<input class="w-full p-3 rounded-lg border border-border focus:border-primary focus:ring-primary/10 transition-all text-body-secondary" placeholder="添加一些描述..." type="text">
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="pt-6 border-t border-border flex flex-col sm:flex-row gap-4">
+<button class="flex-1 bg-primary text-on-primary py-4 rounded-xl font-semibold hover:bg-primary-hover transition-all active:scale-[0.98] shadow-lg shadow-primary/10 flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined">check</span>
+                            确认保存
+                        </button>
+<button class="px-8 py-4 bg-surface border border-border text-text-secondary rounded-xl font-semibold hover:bg-surface-container-low transition-all active:scale-[0.98]" type="button">
+                            取消
+                        </button>
+</div>
+</form>
+</div>
+<!-- Tips Section -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-4 bg-primary/5 rounded-lg border border-primary/10 flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">lightbulb</span>
+<p class="text-body-secondary text-on-primary-fixed-variant leading-tight">提示：您可以直接在首页设置快捷记账模板。</p>
+</div>
+<div class="p-4 bg-secondary/5 rounded-lg border border-secondary/10 flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl">shield</span>
+<p class="text-body-secondary text-on-secondary-fixed-variant leading-tight">安全：您的数据已进行本地加密存储。</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Toast (Hidden by default) -->
+<div class="fixed top-8 left-1/2 -translate-x-1/2 bg-on-surface text-surface px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 transform -translate-y-24 opacity-0 transition-all duration-500 z-[100]" id="successToast">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="font-medium">账目已保存成功</span>
+</div>
+<script>
+        // Set default date to today
+        document.getElementById('datePicker').valueAsDate = new Date();
+
+        // Category selection behavior
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryBtns.forEach(b => {
+                    b.classList.remove('bg-primary-container', 'text-on-primary-container', 'border-primary');
+                    b.classList.add('border-border');
+                });
+                btn.classList.remove('border-border');
+                btn.classList.add('bg-primary-container', 'text-on-primary-container', 'border-primary');
+            });
+        });
+
+        // Form Submission Interaction
+        const form = document.getElementById('recordForm');
+        const toast = document.getElementById('successToast');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Show toast
+            toast.classList.remove('-translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            // Reset form (simulated)
+            setTimeout(() => {
+                toast.classList.add('-translate-y-24', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                form.reset();
+                document.getElementById('datePicker').valueAsDate = new Date();
+                categoryBtns.forEach(b => {
+                    b.classList.remove('bg-primary-container', 'text-on-primary-container', 'border-primary');
+                    b.classList.add('border-border');
+                });
+            }, 3000);
+        });
+
+        // Micro-interaction for amount input (limit decimal places)
+        const amountInput = form.querySelector('input[type="number"]');
+        amountInput.addEventListener('input', function(e) {
+            let t = e.target.value;
+            e.target.value = (t.indexOf(".") >= 0) ? (t.substr(0, t.indexOf(".")) + t.substr(t.indexOf("."), 3)) : t;
+        });
+    </script>
+
+
+</body></html>

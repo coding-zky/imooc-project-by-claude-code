@@ -1,0 +1,250 @@
+<!DOCTYPE html><html lang="zh-CN" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>LightLedger - 偏好设置</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E5E7EB;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#191c1d",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-secondary-fixed": "#002113",
+                        "secondary": "#006c49",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#434655",
+                        "background": "#f8f9fa",
+                        "secondary-container": "#6cf8bb",
+                        "surface-dim": "#d9dadb",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface": "#FFFFFF",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#edeeef",
+                        "outline-variant": "#c3c6d7",
+                        "surface-variant": "#e1e3e4",
+                        "outline": "#737686",
+                        "on-surface": "#191c1d",
+                        "tertiary-fixed": "#ffddb8",
+                        "tertiary": "#784b00",
+                        "on-secondary-fixed-variant": "#005236",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-bright": "#f8f9fa",
+                        "on-primary-container": "#eeefff",
+                        "tertiary-container": "#996100",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#0053db",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "text-secondary": "#6B7280",
+                        "primary-hover": "#1D4ED8",
+                        "inverse-primary": "#b4c5ff",
+                        "on-tertiary-fixed": "#2a1700",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary-container": "#ffeedd",
+                        "error": "#EF4444",
+                        "on-secondary-container": "#00714d",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "inverse-surface": "#2e3132",
+                        "primary-container": "#2563eb",
+                        "on-primary-fixed": "#00174b",
+                        "text-primary": "#111827",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-container-low": "#f3f4f5",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-primary": "#ffffff",
+                        "border": "#E5E7EB",
+                        "primary": "#004ac6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "layout-margin": "24px",
+                        "md": "16px",
+                        "layout-gutter": "16px",
+                        "sm": "12px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "lg": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "display-title": ["Inter"],
+                        "label-helper": ["Inter"],
+                        "body-secondary": ["Inter"],
+                        "display-title-mobile": ["Inter"],
+                        "headline-card": ["Inter"],
+                        "body-main": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "label-helper": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "body-secondary": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-title-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-card": ["18px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-main": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="w-full top-0 bg-surface dark:bg-surface-dim border-b border-border dark:border-outline-variant z-50">
+<div class="flex justify-between items-center h-16 px-layout-margin max-w-[1280px] mx-auto">
+<div class="flex items-center gap-xl">
+<span class="text-display-title font-display-title text-primary dark:text-primary-fixed">轻账本</span>
+<div class="hidden md:flex gap-lg items-center"><a class="text-text-secondary dark:text-on-surface-variant font-body-main text-body-main hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">首页</a><a class="text-text-secondary dark:text-on-surface-variant font-body-main text-body-main hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">记录消费</a><a class="text-text-secondary dark:text-on-surface-variant font-body-main text-body-main hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">消费明细</a><a class="text-text-secondary dark:text-on-surface-variant font-body-main text-body-main hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">统计报表</a></div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-xs text-text-secondary hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-xs text-text-secondary hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-border">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A professional and clean studio headshot of a user for a profile avatar. The background is a soft, neutral grey. The lighting is bright and even, reflecting a modern, tech-focused aesthetic with a friendly but professional atmosphere. High-resolution digital photography with subtle depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDC-bXP9aTy6saM8HNoa8MD69LMmn3HHJU9MKmNXaqdTfTOilgcHCdSzAg94O9Etv-n95M0PinlJo6mpzsJZiUtiTbpn68wc6qPUqLk5rXQ0_cjPSpF1ldBXuKFmihPcPoyDpY1K4J72aLuCVeJEKVimCkU1b6rpG_E_YhcJEkvt3Olc8AAFToO6yoRH5jJGrXYMOc5vgGaE9N274T5vtub2M5ZLFNGoj3w_yrWVzcL6lMxIsn4TtJRdeuudc4h9wzBRvk4tEuSYTXC">
+</div>
+</div>
+</div>
+</nav>
+<main class="flex-1 flex max-w-[1280px] w-full mx-auto">
+<!-- SideNavBar -->
+<aside class="h-full w-64 bg-surface dark:bg-surface-dim border-r border-border dark:border-outline-variant flex flex-col py-lg px-md gap-sm hidden md:flex">
+<div class="px-sm mb-lg"><h1 class="font-headline-card text-headline-card text-on-surface dark:text-inverse-on-surface">设置</h1><p class="font-body-secondary text-body-secondary text-text-secondary">管理您的账户</p></div>
+<nav class="space-y-1"><a class="flex items-center gap-sm px-sm py-md rounded-lg text-text-secondary dark:text-on-surface-variant font-body-secondary text-body-secondary hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-[0.98]" href="#"><span class="material-symbols-outlined" data-icon="person">person</span><span class="">个人资料</span></a><a class="flex items-center gap-sm px-sm py-md rounded-lg text-text-secondary dark:text-on-surface-variant font-body-secondary text-body-secondary hover:bg-surface-container dark:hover:bg-surface-container-high transition-all active:scale-[0.98]" href="#"><span class="material-symbols-outlined" data-icon="shield">shield</span><span class="">账户安全</span></a><a class="flex items-center gap-sm px-sm py-md rounded-lg bg-primary-container/10 text-primary dark:text-primary-fixed font-semibold font-body-secondary text-body-secondary transition-all active:scale-[0.98]" href="#"><span class="material-symbols-outlined" data-icon="settings">settings</span><span class="">偏好设置</span></a></nav>
+<div class="mt-auto pt-lg border-t border-border dark:border-outline-variant"><button class="flex items-center gap-sm px-sm py-md w-full rounded-lg text-error hover:bg-error-container/10 transition-all active:scale-[0.98] font-body-secondary text-body-secondary"><span class="material-symbols-outlined" data-icon="logout">logout</span><span class="">退出登录</span></button></div></aside>
+<!-- Main Content Area -->
+<section class="flex-1 p-layout-margin overflow-y-auto custom-scrollbar">
+<div class="max-w-[720px]">
+<header class="mb-xl">
+<h2 class="text-display-title font-display-title text-on-background">偏好设置</h2>
+<p class="text-text-secondary font-body-main text-body-main mt-xs">自定义您的个性化理财体验</p>
+</header>
+<div class="space-y-lg">
+<!-- General Settings Section -->
+
+<!-- Display Settings Section -->
+<div class="bg-surface border border-border rounded-xl p-lg space-y-md">
+<h3 class="font-headline-card text-headline-card text-on-surface">显示设置</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Default Page -->
+<div class="space-y-xs">
+<label class="text-text-secondary font-label-helper text-label-helper px-base">默认显示页面</label>
+<div class="relative">
+<select class="w-full bg-surface border border-border rounded-lg px-md py-sm text-body-main focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none appearance-none cursor-pointer">
+<option selected="" value="dashboard">首页 / 仪表盘</option>
+<option value="transactions">消费明细</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Items per page -->
+<div class="space-y-xs">
+<label class="text-text-secondary font-label-helper text-label-helper px-base">每页显示条数</label>
+<div class="relative">
+<select class="w-full bg-surface border border-border rounded-lg px-md py-sm text-body-main focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none appearance-none cursor-pointer">
+<option value="10">10 条</option>
+<option selected="" value="20">20 条</option>
+<option value="50">50 条</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Notifications Section -->
+<div class="bg-surface border border-border rounded-xl p-lg space-y-md">
+<h3 class="font-headline-card text-headline-card text-on-surface">消息通知</h3>
+<div class="space-y-sm">
+<!-- Reminder Toggle -->
+<div class="flex items-center justify-between p-md bg-surface-container-low rounded-lg transition-all hover:bg-surface-container">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+</div>
+<div>
+<p class="font-body-main text-body-main text-on-surface font-semibold">每日记账提醒</p>
+<p class="font-label-helper text-label-helper text-text-secondary">在设定的时间提醒您记录今日支出</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<!-- Budget Alert Toggle -->
+
+</div>
+</div>
+<!-- Actions -->
+<div class="pt-lg flex items-center justify-end border-t border-border mt-xl">
+<button class="px-xl py-md bg-primary-container text-on-primary-container font-body-main text-body-main rounded-lg font-semibold hover:brightness-110 active:scale-95 transition-all shadow-md">
+                            保存修改
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Mobile Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-border h-16 flex items-center justify-around px-md z-50"><button class="flex flex-col items-center gap-1 text-text-secondary"><span class="material-symbols-outlined" data-icon="dashboard">dashboard</span><span class="text-[10px]">首页</span></button><button class="flex flex-col items-center gap-1 text-text-secondary"><span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span><span class="text-[10px]">统计报表</span></button><button class="flex flex-col items-center gap-1 text-primary"><span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span><span class="text-[10px]">设置</span></button></nav>
+<script>
+        // Simple micro-interaction for toggle switches
+        document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const parent = this.closest('.bg-surface-container-low');
+                if (this.checked) {
+                    parent.classList.add('ring-1', 'ring-primary/20');
+                } else {
+                    parent.classList.remove('ring-1', 'ring-primary/20');
+                }
+            });
+        });
+
+        // Hover effect for select containers
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('focus', () => {
+                select.parentElement.classList.add('ring-2', 'ring-primary/10');
+            });
+            select.addEventListener('blur', () => {
+                select.parentElement.classList.remove('ring-2', 'ring-primary/10');
+            });
+        });
+    </script>
+
+
+</body></html>

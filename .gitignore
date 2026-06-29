@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local

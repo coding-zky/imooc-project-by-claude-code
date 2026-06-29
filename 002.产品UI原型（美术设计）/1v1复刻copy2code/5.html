@@ -1,0 +1,415 @@
+<!doctype html>
+<html class="light" lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>个人信息设置 - 轻账本</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#edeeef",
+              "on-secondary-container": "#00714d",
+              secondary: "#006c49",
+              "secondary-fixed": "#6ffbbe",
+              "text-secondary": "#6B7280",
+              "on-error": "#ffffff",
+              "tertiary-container": "#996100",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary": "#ffffff",
+              "inverse-primary": "#b4c5ff",
+              surface: "#FFFFFF",
+              "on-surface-variant": "#434655",
+              "inverse-on-surface": "#f0f1f2",
+              "primary-fixed-dim": "#b4c5ff",
+              "on-tertiary-container": "#ffeedd",
+              border: "#E5E7EB",
+              "surface-tint": "#0053db",
+              "on-secondary-fixed": "#002113",
+              "primary-container": "#2563eb",
+              "on-tertiary-fixed-variant": "#653e00",
+              "surface-dim": "#d9dadb",
+              "secondary-container": "#6cf8bb",
+              "inverse-surface": "#2e3132",
+              "surface-variant": "#e1e3e4",
+              "on-primary": "#ffffff",
+              "surface-container-high": "#e7e8e9",
+              error: "#EF4444",
+              "error-container": "#ffdad6",
+              "surface-container-highest": "#e1e3e4",
+              "on-primary-fixed-variant": "#003ea8",
+              "text-primary": "#111827",
+              "outline-variant": "#c3c6d7",
+              "on-tertiary-fixed": "#2a1700",
+              primary: "#004ac6",
+              "surface-container-low": "#f3f4f5",
+              "primary-fixed": "#dbe1ff",
+              "secondary-fixed-dim": "#4edea3",
+              background: "#f8f9fa",
+              "on-primary-fixed": "#00174b",
+              "tertiary-fixed-dim": "#ffb95f",
+              tertiary: "#784b00",
+              "on-secondary-fixed-variant": "#005236",
+              "on-error-container": "#93000a",
+              "primary-hover": "#1D4ED8",
+              "on-primary-container": "#eeefff",
+              "tertiary-fixed": "#ffddb8",
+              "on-surface": "#191c1d",
+              outline: "#737686",
+              "on-tertiary": "#ffffff",
+              "on-background": "#191c1d",
+              "surface-bright": "#f8f9fa",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              xl: "32px",
+              lg: "24px",
+              sm: "12px",
+              "layout-margin": "24px",
+              md: "16px",
+              xs: "8px",
+              "layout-gutter": "16px",
+              base: "4px",
+            },
+            fontFamily: {
+              "headline-card": ["Inter"],
+              "display-title-mobile": ["Inter"],
+              "display-title": ["Inter"],
+              "label-helper": ["Inter"],
+              "body-main": ["Inter"],
+              "body-secondary": ["Inter"],
+            },
+            fontSize: {
+              "headline-card": [
+                "18px",
+                {
+                  lineHeight: "26px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              "display-title-mobile": [
+                "20px",
+                { lineHeight: "28px", fontWeight: "600" },
+              ],
+              "display-title": [
+                "24px",
+                {
+                  lineHeight: "32px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "label-helper": [
+                "12px",
+                { lineHeight: "16px", fontWeight: "400" },
+              ],
+              "body-main": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "body-secondary": [
+                "14px",
+                { lineHeight: "20px", fontWeight: "400" },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .active-scale:active {
+        transform: scale(0.98);
+      }
+    </style>
+  </head>
+  <body class="flex flex-col min-h-screen bg-background text-on-background">
+    <!-- TopNavBar Component -->
+    <header class="top-0 z-30 w-full border-b bg-surface border-border">
+      <div
+        class="flex justify-between items-center h-16 px-layout-margin max-w-[1280px] mx-auto"
+      >
+        <div class="flex items-center gap-xl">
+          <span class="text-display-title font-display-title text-primary"
+            >轻账本</span
+          >
+          <nav class="items-center hidden md:flex gap-lg">
+            <a
+              class="transition-colors font-body-main text-body-main text-text-secondary hover:text-primary"
+              href="#"
+              >首页</a
+            ><a
+              class="transition-colors font-body-main text-body-main text-text-secondary hover:text-primary"
+              href="#"
+              >记录消费</a
+            ><a
+              class="transition-colors font-body-main text-body-main text-text-secondary hover:text-primary"
+              href="#"
+              >消费明细</a
+            ><a
+              class="transition-colors font-body-main text-body-main text-text-secondary hover:text-primary"
+              href="#"
+              >统计报表</a
+            >
+          </nav>
+        </div>
+        <div class="flex items-center gap-md">
+          <button
+            class="p-2 transition-all rounded-full text-text-secondary hover:bg-surface-container"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            class="p-2 transition-all rounded-full text-text-secondary hover:bg-surface-container"
+          >
+            <span class="material-symbols-outlined">help</span>
+          </button>
+          <div
+            class="w-8 h-8 ml-2 overflow-hidden rounded-full bg-surface-container"
+          >
+            <img
+              class="object-cover w-full h-full"
+              data-alt="A professional business headshot of a software developer with a clean, modern aesthetic. The background is a soft-focus office interior with minimalist decor and natural lighting. The color palette is composed of cool grays and crisp whites, reflecting a high-end corporate identity."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfNLP-qNupXIU5UBg2Ag48yKq9VtsbFmbuZJ0EJla5ptCQCdSHBVMEqqntqXJuk-S0LbA0-FXQVDtEvUpbNVLiciDLcQ00CTx-zztAkdtqviwv1jLv4AOYRKuXbGd73q6VWRarusdvCIx43YOhA8ndqi050ru-R6co_oCXoBMt_i6UQTjjkBKfl3hdHHXDpL09J2pPQYw8eQtFuZLKwIuMycx1KDfURaRaPjVlUPPLc72pg0VqCeDAnc6RMz3hqH0B2L9fwdHrCayB"
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="flex-1 flex overflow-hidden max-w-[1280px] w-full mx-auto">
+      <!-- SideNavBar Component -->
+      <aside
+        class="flex-col hidden w-64 h-full border-r bg-surface border-border md:flex py-lg px-md gap-sm shrink-0"
+      >
+        <div class="mb-lg px-xs">
+          <h2 class="font-headline-card text-headline-card text-on-surface">
+            设置
+          </h2>
+          <p
+            class="font-body-secondary text-body-secondary text-text-secondary"
+          >
+            管理您的账户设置
+          </p>
+        </div>
+        <nav class="flex flex-col gap-xs">
+          <a
+            class="flex items-center transition-all rounded-lg gap-md px-md py-sm text-text-secondary hover:bg-surface-container active-scale"
+            href="#"
+          >
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-body-secondary text-body-secondary"
+              >个人资料</span
+            >
+          </a>
+          <a
+            class="flex items-center font-semibold transition-all rounded-lg gap-md px-md py-sm bg-primary-container/10 text-primary active-scale"
+            href="#"
+          >
+            <span class="material-symbols-outlined">shield</span>
+            <span class="font-body-secondary text-body-secondary"
+              >账户安全</span
+            >
+          </a>
+          <a
+            class="flex items-center transition-all rounded-lg gap-md px-md py-sm text-text-secondary hover:bg-surface-container active-scale"
+            href="#"
+          >
+            <span class="material-symbols-outlined">settings</span>
+            <span class="font-body-secondary text-body-secondary"
+              >偏好设置</span
+            >
+          </a>
+          <div class="border-t mt-lg pt-lg border-border">
+            <a
+              class="flex items-center transition-all rounded-lg gap-md px-md py-sm text-error hover:bg-error-container/10 active-scale"
+              href="#"
+            >
+              <span class="material-symbols-outlined">logout</span>
+              <span class="font-body-secondary text-body-secondary"
+                >退出登录</span
+              >
+            </a>
+          </div>
+        </nav>
+      </aside>
+      <!-- Main Content Area -->
+      <main
+        class="flex-1 overflow-y-auto bg-background p-layout-margin lg:p-xl"
+      >
+        <div class="max-w-3xl">
+          <h1
+            class="font-display-title text-display-title text-on-surface mb-xl"
+          >
+            账户安全
+          </h1>
+          <form class="space-y-lg">
+            <!-- Section 1: 基本资料 -->
+            <!-- Section 2: 账户安全 -->
+            <div
+              class="border bg-surface rounded-xl border-border p-lg space-y-lg"
+            >
+              <div
+                class="flex items-center border-b gap-md pb-xs border-border"
+              >
+                <span class="material-symbols-outlined text-primary"
+                  >security</span
+                >
+                <h3 class="font-headline-card text-headline-card">账户安全</h3>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                <div
+                  class="flex items-center justify-between transition-colors border cursor-pointer p-md border-border rounded-xl hover:border-outline group"
+                >
+                  <div class="flex items-center gap-md">
+                    <div
+                      class="flex items-center justify-center w-10 h-10 rounded-full bg-surface-container"
+                    >
+                      <span
+                        class="material-symbols-outlined text-on-surface-variant"
+                        >lock_reset</span
+                      >
+                    </div>
+                    <div>
+                      <p class="font-semibold font-body-main text-body-main">
+                        修改密码
+                      </p>
+                      <p
+                        class="font-label-helper text-label-helper text-text-secondary"
+                      >
+                        上次修改：3个月前
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="transition-transform material-symbols-outlined text-text-secondary group-hover:translate-x-1"
+                    >chevron_right</span
+                  >
+                </div>
+                <div
+                  class="flex items-center justify-between transition-colors border cursor-pointer p-md border-border rounded-xl hover:border-outline group"
+                >
+                  <div class="flex items-center gap-md">
+                    <div
+                      class="flex items-center justify-center w-10 h-10 rounded-full bg-surface-container"
+                    >
+                      <span
+                        class="material-symbols-outlined text-on-surface-variant"
+                        >smartphone</span
+                      >
+                    </div>
+                    <div>
+                      <p class="font-semibold font-body-main text-body-main">
+                        绑定手机
+                      </p>
+                      <p
+                        class="rounded font-label-helper text-label-helper text-on-secondary-container bg-secondary-container/20 px-xs"
+                      >
+                        已绑定: 138****0000
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="transition-transform material-symbols-outlined text-text-secondary group-hover:translate-x-1"
+                    >chevron_right</span
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Actions -->
+            <div class="flex items-center justify-end pt-lg">
+              <button
+                class="font-semibold transition-all rounded-lg shadow-sm px-xl py-md bg-primary text-on-primary font-body-main text-body-main hover:bg-primary-hover active-scale"
+                type="submit"
+              >
+                保存修改
+              </button>
+            </div>
+          </form>
+          <!-- Micro-interaction overlay (hidden) -->
+          <div
+            class="fixed top-layout-margin left-1/2 -translate-x-1/2 px-lg py-md bg-inverse-surface text-inverse-on-surface rounded-lg shadow-xl translate-y-[-100px] opacity-0 transition-all duration-300 z-50 flex items-center gap-md"
+            id="toast"
+          >
+            <span class="material-symbols-outlined text-on-secondary-fixed"
+              >check_circle</span
+            >
+            <span class="font-body-main">设置已成功保存</span>
+          </div>
+        </div>
+      </main>
+    </div>
+    <!-- Mobile Navigation (BottomNavBar) -->
+    <nav
+      class="fixed bottom-0 left-0 z-40 flex items-center justify-around w-full h-16 border-t md:hidden bg-surface border-border px-md"
+    >
+      <button class="flex flex-col items-center gap-1 text-text-secondary">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span class="text-[10px] font-medium">首页</span>
+      </button>
+      <button class="flex flex-col items-center gap-1 text-primary">
+        <span
+          class="material-symbols-outlined"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >person</span
+        >
+        <span class="text-[10px] font-medium">设置</span>
+      </button>
+      <button class="flex flex-col items-center gap-1 text-text-secondary">
+        <span class="material-symbols-outlined">analytics</span>
+        <span class="text-[10px] font-medium">明细</span>
+      </button>
+    </nav>
+    <script>
+      // Simple micro-interaction for form submission
+      document.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const toast = document.getElementById("toast");
+        toast.style.transform = "translateX(-50%) translateY(20px)";
+        toast.style.opacity = "1";
+
+        setTimeout(() => {
+          toast.style.transform = "translateX(-50%) translateY(-100px)";
+          toast.style.opacity = "0";
+        }, 3000);
+      });
+
+      // Hover animation for cards
+      const securityCards = document.querySelectorAll(".grid-cols-1 .group");
+      securityCards.forEach((card) => {
+        card.addEventListener("mouseenter", () => {
+          card.style.transform = "translateY(-2px)";
+          card.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.04)";
+        });
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "translateY(0)";
+          card.style.boxShadow = "none";
+        });
+      });
+    </script>
+  </body>
+</html>

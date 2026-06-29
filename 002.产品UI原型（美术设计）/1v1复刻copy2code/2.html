@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>LightLedger / 轻账本 - 登录</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#c3c6d7",
+              "text-secondary": "#6B7280",
+              "inverse-on-surface": "#f0f1f2",
+              "text-primary": "#111827",
+              background: "#f8f9fa",
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-surface": "#2e3132",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-bright": "#f8f9fa",
+              tertiary: "#784b00",
+              "error-container": "#ffdad6",
+              "tertiary-fixed": "#ffddb8",
+              "on-tertiary-container": "#ffeedd",
+              "on-secondary": "#ffffff",
+              error: "#EF4444",
+              "on-background": "#191c1d",
+              "surface-container-low": "#f3f4f5",
+              "on-primary-container": "#eeefff",
+              "inverse-primary": "#b4c5ff",
+              "on-secondary-fixed": "#002113",
+              "tertiary-container": "#996100",
+              primary: "#004ac6",
+              secondary: "#006c49",
+              outline: "#737686",
+              "on-secondary-container": "#00714d",
+              "on-primary": "#ffffff",
+              "on-surface": "#191c1d",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e1e3e4",
+              "on-secondary-fixed-variant": "#005236",
+              "surface-container": "#edeeef",
+              "on-primary-fixed-variant": "#003ea8",
+              "surface-container-high": "#e7e8e9",
+              "secondary-fixed-dim": "#4edea3",
+              "secondary-container": "#6cf8bb",
+              "secondary-fixed": "#6ffbbe",
+              "primary-container": "#2563eb",
+              "on-tertiary-fixed-variant": "#653e00",
+              "primary-hover": "#1D4ED8",
+              "surface-container-highest": "#e1e3e4",
+              "surface-tint": "#0053db",
+              "primary-fixed": "#dbe1ff",
+              "tertiary-fixed-dim": "#ffb95f",
+              border: "#E5E7EB",
+              "on-surface-variant": "#434655",
+              "on-primary-fixed": "#00174b",
+              surface: "#FFFFFF",
+              "surface-dim": "#d9dadb",
+              "primary-fixed-dim": "#b4c5ff",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              base: "4px",
+              xs: "8px",
+              xl: "32px",
+              "layout-margin": "24px",
+              "layout-gutter": "16px",
+              md: "16px",
+              sm: "12px",
+              lg: "24px",
+            },
+            fontFamily: {
+              "body-main": ["Inter", "sans-serif"],
+              "display-title": ["Inter", "sans-serif"],
+              "body-secondary": ["Inter", "sans-serif"],
+              "display-title-mobile": ["Inter", "sans-serif"],
+              "headline-card": ["Inter", "sans-serif"],
+              "label-helper": ["Inter", "sans-serif"],
+            },
+            fontSize: {
+              "body-main": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+              "display-title": [
+                "24px",
+                {
+                  lineHeight: "32px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-secondary": [
+                "14px",
+                { lineHeight: "20px", fontWeight: "400" },
+              ],
+              "display-title-mobile": [
+                "20px",
+                { lineHeight: "28px", fontWeight: "600" },
+              ],
+              "headline-card": [
+                "18px",
+                {
+                  lineHeight: "26px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              "label-helper": [
+                "12px",
+                { lineHeight: "16px", fontWeight: "400" },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8f9fa;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .login-card {
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+      .btn-press:active {
+        transform: scale(0.98);
+      }
+    </style>
+  </head>
+  <body class="flex flex-col min-h-screen bg-background">
+    <!-- Header / Top Navigation (Suppressed per "The Destination Rule", but Brand Logo preserved) -->
+    <header class="flex justify-center w-full pt-xl">
+      <div class="flex items-center gap-xs">
+        <span class="text-3xl material-symbols-outlined text-primary"
+          >account_balance_wallet</span
+        >
+        <h1
+          class="font-extrabold tracking-tight font-display-title text-display-title text-primary"
+        >
+          轻账本
+        </h1>
+      </div>
+    </header>
+    <!-- Main Content Area -->
+    <main class="flex items-center justify-center flex-grow px-layout-margin">
+      <div
+        class="w-full max-w-md border shadow-sm bg-surface p-lg rounded-xl border-border login-card"
+      >
+        <!-- Branding/Identity -->
+        <div class="text-center mb-lg">
+          <h2
+            class="font-display-title text-display-title text-text-primary mb-xs"
+          >
+            欢迎回来
+          </h2>
+          <p
+            class="font-body-secondary text-body-secondary text-text-secondary"
+          >
+            请登录您的账户以继续管理财务
+          </p>
+        </div>
+        <!-- Login Form -->
+        <form action="#" class="space-y-md" method="POST">
+          <!-- Username Field -->
+          <div class="space-y-xs">
+            <label
+              class="block ml-1 font-label-helper text-label-helper text-on-surface-variant"
+              for="username"
+              >用户名 / 电子邮箱</label
+            >
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline text-[20px]"
+                >person</span
+              >
+              <input
+                class="w-full transition-all border rounded-lg outline-none pl-xl pr-md py-sm bg-surface border-border text-body-main font-body-main focus:ring-2 focus:ring-primary/10 focus:border-primary"
+                id="username"
+                name="username"
+                placeholder="请输入您的用户名"
+                required=""
+                type="text"
+              />
+            </div>
+          </div>
+          <!-- Password Field -->
+          <div class="space-y-xs">
+            <div class="flex items-center justify-between px-1">
+              <label
+                class="font-label-helper text-label-helper text-on-surface-variant"
+                for="password"
+                >密码</label
+              >
+              <a
+                class="font-label-helper text-label-helper text-primary hover:underline"
+                href="#"
+                >忘记密码？</a
+              >
+            </div>
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline text-[20px]"
+                >lock</span
+              >
+              <input
+                class="w-full transition-all border rounded-lg outline-none pl-xl pr-xl py-sm bg-surface border-border text-body-main font-body-main focus:ring-2 focus:ring-primary/10 focus:border-primary"
+                id="password"
+                name="password"
+                placeholder="请输入您的密码"
+                required=""
+                type="password"
+              />
+              <button
+                class="absolute transition-colors -translate-y-1/2 right-sm top-1/2 text-outline hover:text-text-primary"
+                type="button"
+              >
+                <span class="material-symbols-outlined text-[20px]"
+                  >visibility_off</span
+                >
+              </button>
+            </div>
+          </div>
+          <!-- Remember Me & Login Button -->
+          <div class="flex items-center gap-xs py-xs">
+            <input
+              class="w-4 h-4 rounded text-primary border-border focus:ring-primary"
+              id="remember"
+              type="checkbox"
+            />
+            <label
+              class="select-none font-body-secondary text-body-secondary text-text-secondary"
+              for="remember"
+              >保持登录状态</label
+            >
+          </div>
+          <button
+            class="flex items-center justify-center w-full transition-all rounded-lg shadow-sm py-sm bg-primary text-on-primary font-headline-card hover:bg-primary-hover btn-press gap-xs"
+            type="submit"
+          >
+            <span class="">登录</span>
+            <span class="material-symbols-outlined text-[20px]"
+              >arrow_forward</span
+            >
+          </button>
+        </form>
+        <!-- Registration Redirect -->
+        <div class="text-center border-t mt-lg pt-lg border-border">
+          <p
+            class="font-body-secondary text-body-secondary text-text-secondary"
+          >
+            还没有账号？
+            <a class="font-semibold text-primary hover:underline" href="#"
+              >立即注册</a
+            >
+          </p>
+        </div>
+      </div>
+    </main>
+    <!-- Footer / Decorative Elements -->
+    <footer class="text-center py-lg px-layout-margin">
+      <p class="font-label-helper text-label-helper text-outline">
+        © 2024 轻账本. 简洁、高效、专业的个人财务管理工具。
+      </p>
+      <!-- Social/Support Links -->
+      <div class="flex justify-center gap-md mt-sm">
+        <a
+          class="transition-colors text-outline hover:text-text-secondary"
+          href="#"
+          ><span class="material-symbols-outlined text-[20px]">help</span></a
+        >
+        <a
+          class="transition-colors text-outline hover:text-text-secondary"
+          href="#"
+          ><span class="material-symbols-outlined text-[20px]"
+            >language</span
+          ></a
+        >
+        <a
+          class="transition-colors text-outline hover:text-text-secondary"
+          href="#"
+          ><span class="material-symbols-outlined text-[20px]">shield</span></a
+        >
+      </div>
+    </footer>
+    <!-- Image Illustration - Positioning as a subtle background element to maintain minimalism -->
+    <div
+      class="fixed bottom-0 right-0 hidden pointer-events-none p-xl lg:block opacity-10"
+    >
+      <img
+        class="object-contain w-64 h-64"
+        data-alt="A minimalist 3D isometric illustration of a sleek financial graph rising upwards. The visual style is professional with clean white surfaces, soft blue primary accents, and subtle ambient shadows. The background is a crisp white gallery space, emphasizing efficiency and clarity in financial growth. The lighting is bright and airy, typical of a modern high-end SaaS product interface."
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvhMcXaJFVvJnpeCHLWSjNl6ywlk7ZFOjV5mqaR9b2JZKA3weYWC0XcfDVy92ZA1v5ogrbWktYoyjJRho0hVoZ3UtDyONl1Z45CQHB6FLFdm7TVdKZzFlDTK0sVdf1ZYHfvuJB0xl0yM8Cjm5j1Hjn9jYF3pyfwIxYV8mkWFoA1sI4ZMiEpbtN_V-6dKqimX4LzL9Dfh0vM8qrs0AdqCXWm_2BLMfBN8zPF3xnwx_n7zC4OMd3gJbdh1N9lHQ35aS-BrwlbZcIkOmG"
+      />
+    </div>
+    <!-- Micro-interaction Script -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const togglePassword = document.querySelector('button[type="button"]');
+        const passwordInput = document.getElementById("password");
+        const visibilityIcon = togglePassword.querySelector(
+          ".material-symbols-outlined",
+        );
+
+        togglePassword.addEventListener("click", () => {
+          const type =
+            passwordInput.getAttribute("type") === "password"
+              ? "text"
+              : "password";
+          passwordInput.setAttribute("type", type);
+          visibilityIcon.textContent =
+            type === "password" ? "visibility_off" : "visibility";
+        });
+
+        // Input focus atmospheric effect
+        const inputs = document.querySelectorAll("input");
+        inputs.forEach((input) => {
+          input.addEventListener("focus", () => {
+            input.parentElement.parentElement.classList.add("scale-[1.01]");
+          });
+          input.addEventListener("blur", () => {
+            input.parentElement.parentElement.classList.remove("scale-[1.01]");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
