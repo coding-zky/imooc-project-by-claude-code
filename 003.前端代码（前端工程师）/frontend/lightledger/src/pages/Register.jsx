@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
-import { storage } from '../utils/storage'
+import { api } from '../utils/api'
 
 export const Register = () => {
   const navigate = useNavigate()
@@ -47,22 +47,22 @@ export const Register = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validate()) return
 
     setLoading(true)
-    const result = storage.createUser(formData.username, formData.password)
-
-    if (result.success) {
-      login(formData.username)
+    try {
+      const result = await api.register(formData.username, formData.password)
+      login(result.user.username)
       showToast('注册成功', 'success')
       navigate('/')
-    } else {
-      showToast(result.error, 'error')
-      setErrors({ username: result.error })
+    } catch (error) {
+      showToast(error.message || '注册失败', 'error')
+      setErrors({ username: error.message || '注册失败' })
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (

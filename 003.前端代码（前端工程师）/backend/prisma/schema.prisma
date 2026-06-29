@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id        BigInt   @id @default(autoincrement())
+  username  String   @unique @map("username") @db.VarChar(50)
+  password  String   @map("password") @db.VarChar(255)
+  email     String?  @map("email") @db.VarChar(100)
+  avatar    String?  @map("avatar") @db.LongText
+  status    Int      @default(1) @map("status")
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime
+
+  records       ExpenseRecord[]
+  sessions      UserSession[]
+  preferences   UserPreference?
+
+  @@map("users")
+  @@index([status])
+  @@index([createdAt])
+}
+
+// 消费分类表
+model ExpenseCategory {
+  id        BigInt   @id @default(autoincrement())
+  name      String   @map("name") @db.VarChar(20)
+  nameEn    String?  @map("name_en") @db.VarChar(30)
+  emoji     String   @map("emoji") @db.VarChar(10)
+  iconName  String?  @map("icon_name") @db.VarChar(50)
+  color     String?  @map("color") @db.VarChar(20)
+  sortOrder Int      @default(0) @map("sort_order")
+  isSystem  Int      @default(1) @map("is_system")
+  status    Int      @default(1) @map("status")
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime
+
+  records ExpenseRecord[]
+
+  @@map("expense_categories")
+  @@index([sortOrder])
+  @@index([isSystem])
+}
+
+// 消费记录表
+model ExpenseRecord {
+  id         String   @id @map("id") @db.VarChar(36)
+  userId     BigInt   @map("user_id")
+  categoryId BigInt   @map("category_id")
+  amount     Decimal  @map("amount") @db.Decimal(10, 2)
+  recordDate DateTime @map("record_date") @db.Date
+  note       String?  @map("note") @db.VarChar(200)
+  status     Int      @default(1) @map("status")
+  createdAt  DateTime @default(now()) @map("created_at") @db.DateTime
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.DateTime
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category ExpenseCategory @relation(fields: [categoryId], references: [id])
+
+  @@map("expense_records")
+  @@index([userId])
+  @@index([categoryId])
+  @@index([recordDate])
+  @@index([userId, recordDate])
+  @@index([userId, categoryId])
+}
+
+// 用户会话表
+model UserSession {
+  id           BigInt   @id @default(autoincrement())
+  userId       BigInt   @map("user_id")
+  sessionToken String   @unique @map("session_token") @db.VarChar(255)
+  ipAddress    String?  @map("ip_address") @db.VarChar(50)
+  userAgent    String?  @map("user_agent") @db.VarChar(500)
+  expiresAt    DateTime @map("expires_at") @db.DateTime
+  status       Int      @default(1) @map("status")
+  createdAt    DateTime @default(now()) @map("created_at") @db.DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// 用户偏好设置表
+model UserPreference {
+  id            BigInt   @id @default(autoincrement())
+  userId        BigInt   @unique @map("user_id")
+  defaultPage   String   @default("dashboard") @map("default_page") @db.VarChar(50)
+  pageSize      Int      @default(20) @map("page_size")
+  reminderEnabled Int    @default(0) @map("reminder_enabled")
+  reminderTime  DateTime? @map("reminder_time") @db.Time
+  currency      String   @default("CNY") @map("currency") @db.VarChar(10)
+  language      String   @default("zh-CN") @map("language") @db.VarChar(10)
+  createdAt     DateTime @default(now()) @map("created_at") @db.DateTime
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}

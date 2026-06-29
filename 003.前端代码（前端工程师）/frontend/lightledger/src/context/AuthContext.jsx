@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { storage } from '../utils/storage'
+import { api } from '../utils/api'
 
 const AuthContext = createContext(null)
 
@@ -16,20 +16,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const session = storage.getSession()
-    if (session) {
-      setUser({ username: session.username })
+    const token = localStorage.getItem('lightledger_token')
+    const username = localStorage.getItem('lightledger_session')
+    if (token && username) {
+      setUser({ username })
     }
     setLoading(false)
   }, [])
 
   const login = (username) => {
-    storage.setSession(username)
+    localStorage.setItem('lightledger_session', username)
     setUser({ username })
   }
 
   const logout = () => {
-    storage.clearSession()
+    localStorage.removeItem('lightledger_token')
+    localStorage.removeItem('lightledger_session')
     setUser(null)
   }
 
