@@ -16,6 +16,7 @@ model User {
   username  String   @unique @map("username") @db.VarChar(50)
   password  String   @map("password") @db.VarChar(255)
   email     String?  @map("email") @db.VarChar(100)
+  phone     String?  @map("phone") @db.VarChar(20)
   avatar    String?  @map("avatar") @db.LongText
   status    Int      @default(1) @map("status")
   createdAt DateTime @default(now()) @map("created_at") @db.DateTime

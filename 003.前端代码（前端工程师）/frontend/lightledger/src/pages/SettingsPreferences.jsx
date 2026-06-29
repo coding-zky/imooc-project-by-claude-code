@@ -1,26 +1,64 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useToast } from '../context/ToastContext'
+import { api } from '../utils/api'
 
 export const SettingsPreferences = () => {
   const { showToast } = useToast()
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [settings, setSettings] = useState({
     defaultPage: 'dashboard',
     pageSize: '20',
-    reminderEnabled: true
+    reminderEnabled: false,
   })
-  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    loadPreferences()
+  }, [])
+
+  const loadPreferences = async () => {
+    setLoading(true)
+    try {
+      const data = await api.getPreferences()
+      setSettings({
+        defaultPage: data.defaultPage || 'dashboard',
+        pageSize: data.pageSize || '20',
+        reminderEnabled: data.reminderEnabled === 1,
+      })
+    } catch (err) {
+      showToast('加载设置失败', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleToggle = (key) => {
     setSettings(prev => ({ ...prev, [key]: !prev[key] }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
-    setTimeout(() => {
+    try {
+      await api.updatePreferences({
+        defaultPage: settings.defaultPage,
+        pageSize: settings.pageSize,
+        reminderEnabled: settings.reminderEnabled,
+      })
       showToast('设置已成功保存', 'success')
+    } catch (err) {
+      showToast(err.message || '保存失败', 'error')
+    } finally {
       setSaving(false)
-    }, 1000)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <span className="material-symbols-outlined text-4xl text-primary animate-spin">sync</span>
+      </div>
+    )
   }
 
   return (

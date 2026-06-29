@@ -1,66 +1,102 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { storage, CATEGORIES, getCategoryById } from '../utils/storage'
-import { formatCurrency, formatDate, getRelativeTime, calculateTotal, calculateCategoryBreakdown } from '../utils/format'
+import { useToast } from '../context/ToastContext'
+import { api } from '../utils/api'
+import { formatCurrency } from '../utils/format'
+
+const CATEGORY_COLORS = ['#2563EB', '#006c49', '#784b00', '#EF4444']
 
 export const Dashboard = () => {
   const { user } = useAuth()
+  const { showToast } = useToast()
+  const [loading, setLoading] = useState(true)
   const [records, setRecords] = useState([])
+  const [stats, setStats] = useState(null)
   const [monthTotal, setMonthTotal] = useState(0)
   const [todayTotal, setTodayTotal] = useState(0)
-  const [categoryBreakdown, setCategoryBreakdown] = useState([])
 
   useEffect(() => {
-    if (user?.username) {
-      const allRecords = storage.getRecords(user.username)
-      setRecords(allRecords.slice(0, 5)) // Recent 5 records
-
-      // Calculate month total
-      const now = new Date()
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-      const monthRecords = allRecords.filter(r => new Date(r.date) >= monthStart)
-      setMonthTotal(calculateTotal(monthRecords))
-
-      // Calculate today total
-      const today = formatDate(new Date())
-      const todayRecords = allRecords.filter(r => r.date === today)
-      setTodayTotal(calculateTotal(todayRecords))
-
-      // Calculate category breakdown
-      const monthTotalValue = calculateTotal(monthRecords)
-      const breakdown = calculateCategoryBreakdown(monthRecords)
-      const sorted = Object.entries(breakdown)
-        .map(([category, amount]) => ({
-          category: getCategoryById(category),
-          amount,
-          percentage: monthTotalValue > 0 ? Math.round((amount / monthTotalValue) * 100) : 0
-        }))
-        .sort((a, b) => b.amount - a.amount)
-      setCategoryBreakdown(sorted.slice(0, 4))
-    }
+    loadData()
   }, [user])
 
-  // Get last 7 days data
-  const getLast7DaysData = () => {
-    const data = []
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date()
-      date.setDate(date.getDate() - i)
-      const dateStr = formatDate(date)
-      const dayRecords = records.filter(r => r.date === dateStr)
-      const total = calculateTotal(dayRecords)
-      data.push({
-        date: dateStr,
-        label: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()],
-        amount: total
-      })
+  const loadData = async () => {
+    if (!user?.username) return
+    setLoading(true)
+    try {
+      const now = new Date()
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+
+      // Fetch stats (7 days) and recent records in parallel
+      const [statsData, recordsData] = await Promise.all([
+        api.getStats(7).catch(() => null),
+        api.getRecords({ month: currentMonth, pageSize: 3 }).catch(() => ({ records: [] })),
+      ])
+
+      setStats(statsData)
+      setRecords(recordsData.records || [])
+
+      // Calculate month total from records
+      if (recordsData.records) {
+        const total = recordsData.records.reduce((sum, r) => sum + Number(r.amount), 0)
+        setMonthTotal(total)
+      }
+
+      // Calculate today total from stats daily data
+      if (statsData?.dailyData) {
+        const today = now.toISOString().split('T')[0]
+        const todayData = statsData.dailyData.find(d => d.date === today)
+        setTodayTotal(todayData ? todayData.amount : 0)
+      }
+    } catch (err) {
+      showToast('加载数据失败', 'error')
+    } finally {
+      setLoading(false)
     }
-    return data
+  }
+
+  // Get last 7 days data from stats
+  const getLast7DaysData = () => {
+    if (!stats?.dailyData) {
+      const data = []
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date()
+        date.setDate(date.getDate() - i)
+        data.push({
+          date: date.toISOString().split('T')[0],
+          label: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()],
+          amount: 0,
+        })
+      }
+      return data
+    }
+    return stats.dailyData.map(d => ({
+      ...d,
+      label: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][new Date(d.date).getDay()],
+    }))
   }
 
   const last7Days = getLast7DaysData()
   const maxAmount = Math.max(...last7Days.map(d => d.amount), 1)
+
+  const getRelativeTime = (dateStr) => {
+    const date = new Date(dateStr)
+    const now = new Date()
+    const diffMs = now - date
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    if (diffDays === 0) return '今天'
+    if (diffDays === 1) return '昨天'
+    if (diffDays < 7) return `${diffDays}天前`
+    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <span className="material-symbols-outlined text-4xl text-primary animate-spin">sync</span>
+      </div>
+    )
+  }
 
   return (
     <div className="pb-20 md:pb-8">
@@ -118,7 +154,7 @@ export const Dashboard = () => {
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-md mb-lg">
-        {/* Line Chart */}
+        {/* Bar Chart */}
         <div className="lg:col-span-8 bg-surface border border-border rounded-xl p-lg">
           <div className="flex justify-between items-center mb-lg">
             <h2 className="font-headline-card text-headline-card">最近7天消费趋势</h2>
@@ -131,7 +167,7 @@ export const Dashboard = () => {
                   className="w-12 bg-primary/20 rounded-t-lg relative group transition-all hover:bg-primary/40"
                   style={{ height: `${(day.amount / maxAmount) * 100}%`, minHeight: day.amount > 0 ? '20px' : '4px' }}
                 >
-                  <div className="hidden group-hover:block absolute -top-6 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded whitespace-nowrap">
+                  <div className="hidden group-hover:block absolute -top-6 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-10">
                     ¥{day.amount.toFixed(0)}
                   </div>
                 </div>
@@ -149,24 +185,23 @@ export const Dashboard = () => {
         <div className="lg:col-span-4 bg-surface border border-border rounded-xl p-lg">
           <h2 className="font-headline-card text-headline-card mb-lg">消费分类占比</h2>
           <div className="flex flex-col items-center">
-            {/* Simple pie chart representation */}
             <div className="relative w-32 h-32 mb-lg">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                 <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#E5E7EB" strokeWidth="3" />
-                {monthTotal > 0 ? (
-                  categoryBreakdown.reduce((acc, cat, i) => {
-                    const percentage = monthTotal > 0 ? (cat.amount / monthTotal) * 100 : 0
+                {stats && stats.totalAmount > 0 ? (
+                  stats.categoryData.slice(0, 4).reduce((acc, cat, i) => {
+                    const percentage = (cat.amount / stats.totalAmount) * 100
                     const offset = acc.reduce((sum, _, j) => {
-                      return sum + (monthTotal > 0 ? ((categoryBreakdown[j]?.amount || 0) / monthTotal) * 100 : 0)
+                      return sum + ((stats.categoryData[j]?.amount / stats.totalAmount) * 100)
                     }, 0)
                     acc.push(
                       <circle
-                        key={cat.category.id}
+                        key={cat.categoryId}
                         cx="18"
                         cy="18"
                         fill="transparent"
                         r="15.915"
-                        stroke={['#2563EB', '#006c49', '#784b00', '#EF4444'][i]}
+                        stroke={CATEGORY_COLORS[i]}
                         strokeDasharray={`${percentage} ${100 - percentage}`}
                         strokeDashoffset={-offset}
                         strokeWidth="3"
@@ -180,18 +215,16 @@ export const Dashboard = () => {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-label-helper text-text-secondary">总计</span>
-                <span className="font-bold text-text-primary">¥{(monthTotal / 1000).toFixed(1)}k</span>
+                <span className="font-bold text-text-primary">¥{stats ? (stats.totalAmount / 1000).toFixed(1) : '0'}k</span>
               </div>
             </div>
             {/* Legend */}
             <div className="w-full space-y-sm">
-              {categoryBreakdown.map((cat, i) => (
-                <div key={cat.category.id} className="flex items-center justify-between">
+              {stats?.categoryData?.slice(0, 4).map((cat, i) => (
+                <div key={cat.categoryId} className="flex items-center justify-between">
                   <div className="flex items-center gap-sm">
-                    <span className={`w-3 h-3 rounded-full bg-[${
-                      ['#2563EB', '#006c49', '#784b00', '#EF4444'][i]
-                    }]`} />
-                    <span className="text-body-secondary">{cat.category.name}</span>
+                    <span className="w-3 h-3 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[i] }} />
+                    <span className="text-body-secondary">{cat.emoji} {cat.name}</span>
                   </div>
                   <span className="text-body-secondary font-semibold">{cat.percentage}%</span>
                 </div>
@@ -204,7 +237,7 @@ export const Dashboard = () => {
       {/* Recent Records */}
       <section className="bg-surface border border-border rounded-xl overflow-hidden shadow-sm">
         <div className="p-lg border-b border-border flex justify-between items-center">
-          <h2 className="font-headline-card text-headline-card">最近记录</h2>
+          <h2 className="font-headline-card text-headline-card">最近记账</h2>
           <Link to="/records" className="text-primary text-body-secondary font-semibold hover:underline">
             查看全部
           </Link>
@@ -216,29 +249,24 @@ export const Dashboard = () => {
           </div>
         ) : (
           <div className="divide-y divide-border">
-            {records.map((record) => {
-              const category = getCategoryById(record.category)
-              return (
-                <div key={record.id} className="px-lg py-md flex items-center justify-between hover:bg-surface-container-low transition-all">
-                  <div className="flex items-center gap-md">
-                    <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
-                      <span className="material-symbols-outlined text-on-surface-variant">
-                        {category.icon}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-body-main font-semibold">{record.note || category.name}</p>
-                      <p className="text-label-helper text-text-secondary">
-                        {getRelativeTime(record.date)} · {category.name}
-                      </p>
-                    </div>
+            {records.map((record) => (
+              <div key={record.id} className="px-lg py-md flex items-center justify-between hover:bg-surface-container-low transition-all">
+                <div className="flex items-center gap-md">
+                  <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+                    <span className="text-lg">{record.category?.emoji || '📌'}</span>
                   </div>
-                  <div className="text-right">
-                    <p className="font-body-main font-bold text-text-primary">- {formatCurrency(record.amount)}</p>
+                  <div>
+                    <p className="font-body-main font-semibold">{record.note || record.category?.name || '未知分类'}</p>
+                    <p className="text-label-helper text-text-secondary">
+                      {getRelativeTime(record.recordDate)} · {record.category?.name || '未知'}
+                    </p>
                   </div>
                 </div>
-              )
-            })}
+                <div className="text-right">
+                  <p className="font-body-main font-bold text-text-primary">- {formatCurrency(record.amount)}</p>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </section>

@@ -2,25 +2,34 @@ import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { useAvatar } from '../context/AvatarContext'
+import { api } from '../utils/api'
 
 export const SettingsProfile = () => {
   const { user } = useAuth()
   const { showToast } = useToast()
   const { setAvatar } = useAvatar()
   const fileInputRef = useRef(null)
-  const [email, setEmail] = useState('dev@lightledger.io')
+  const [email, setEmail] = useState('')
   const [avatar, setLocalAvatar] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  // Load avatar from localStorage on mount
   useEffect(() => {
-    if (user?.username) {
-      const savedAvatar = localStorage.getItem(`lightledger_avatar_${user.username}`)
-      if (savedAvatar) {
-        setLocalAvatar(savedAvatar)
-      }
-    }
+    loadProfile()
   }, [user])
+
+  const loadProfile = async () => {
+    setLoading(true)
+    try {
+      const profile = await api.getProfile()
+      setEmail(profile.email || '')
+      setLocalAvatar(profile.avatar || null)
+    } catch (err) {
+      showToast('加载个人资料失败', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click()
@@ -30,53 +39,52 @@ export const SettingsProfile = () => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       showToast('请选择图片文件', 'error')
       return
     }
 
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       showToast('图片大小不能超过 2MB', 'error')
       return
     }
 
-    // Read file as data URL
     const reader = new FileReader()
     reader.onload = (event) => {
       const dataUrl = event.target?.result
       setLocalAvatar(dataUrl)
-      // Save to localStorage
-      if (user?.username) {
-        localStorage.setItem(`lightledger_avatar_${user.username}`, dataUrl)
-        // Notify Header to update avatar
-        window.dispatchEvent(new Event('avatar-updated'))
-      }
       showToast('头像已更新', 'success')
     }
     reader.onerror = () => {
       showToast('读取图片失败', 'error')
     }
     reader.readAsDataURL(file)
-
-    // Reset input so same file can be selected again
     e.target.value = ''
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
-    // Update global avatar state
-    if (avatar) {
-      setAvatar(avatar)
-    }
-    setTimeout(() => {
-      // Notify Header to update avatar
-      window.dispatchEvent(new Event('avatar-updated'))
+    try {
+      await api.updateProfile({ email, avatar })
+      if (avatar) {
+        setAvatar(avatar)
+        window.dispatchEvent(new Event('avatar-updated'))
+      }
       showToast('设置已成功保存', 'success')
+    } catch (err) {
+      showToast(err.message || '保存失败', 'error')
+    } finally {
       setSaving(false)
-    }, 1000)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <span className="material-symbols-outlined text-4xl text-primary animate-spin">sync</span>
+      </div>
+    )
   }
 
   return (
@@ -103,7 +111,6 @@ export const SettingsProfile = () => {
                 ) : (
                   <span className="material-symbols-outlined text-4xl text-on-surface-variant">person</span>
                 )}
-                {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
                   <span className="material-symbols-outlined text-white text-2xl">photo_camera</span>
                 </div>
@@ -115,7 +122,6 @@ export const SettingsProfile = () => {
               >
                 更换头像
               </button>
-              {/* Hidden file input */}
               <input
                 ref={fileInputRef}
                 type="file"

@@ -1,55 +1,142 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
-import { storage, CATEGORIES, getCategoryById } from '../utils/storage'
-import { formatCurrency, formatDate, getRelativeTime, calculateTotal, groupRecordsByDate } from '../utils/format'
+import { api } from '../utils/api'
+import { formatCurrency } from '../utils/format'
 
 export const Records = () => {
   const { user } = useAuth()
   const { showToast } = useToast()
   const [records, setRecords] = useState([])
-  const [filteredRecords, setFilteredRecords] = useState([])
+  const [categories, setCategories] = useState([])
   const [selectedMonth, setSelectedMonth] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const [pageSize] = useState(20)
+  const observerRef = useRef(null)
+  const loadTriggerRef = useRef(null)
+
+  const currentMonth = new Date().toISOString().slice(0, 7)
 
   useEffect(() => {
-    if (user?.username) {
-      const allRecords = storage.getRecords(user.username)
-      setRecords(allRecords)
-      setFilteredRecords(allRecords)
-    }
-  }, [user])
+    loadCategories()
+    loadRecords(true)
+  }, [])
 
   useEffect(() => {
-    let filtered = records
+    if (loadTriggerRef.current) {
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore && !loadingMore) {
+            loadMoreRecords()
+          }
+        },
+        { threshold: 0.1 }
+      )
+      observerRef.current.observe(loadTriggerRef.current)
+    }
+    return () => {
+      if (observerRef.current) observerRef.current.disconnect()
+    }
+  }, [hasMore, loadingMore])
 
-    // Filter by month
-    if (selectedMonth) {
-      filtered = filtered.filter(r => r.date.startsWith(selectedMonth))
+  const loadCategories = async () => {
+    try {
+      const data = await api.getCategories()
+      setCategories(data)
+    } catch (err) {
+      // silent fail
+    }
+  }
+
+  const loadRecords = async (reset = false) => {
+    if (reset) {
+      setLoading(true)
+      setPage(1)
     }
 
-    // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(r => r.category === selectedCategory)
+    try {
+      const params = {
+        page: reset ? 1 : page,
+        pageSize,
+        sortBy: 'recordDate',
+        sortOrder: 'desc',
+      }
+      if (selectedMonth) params.month = selectedMonth
+      if (selectedCategory) params.categoryId = selectedCategory
+
+      const data = await api.getRecords(params)
+      if (reset) {
+        setRecords(data.records || [])
+      } else {
+        setRecords(prev => [...prev, ...(data.records || [])])
+      }
+      setHasMore(data.pagination?.page < data.pagination?.totalPages)
+    } catch (err) {
+      showToast('加载记录失败', 'error')
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
     }
+  }
 
-    setFilteredRecords(filtered)
-  }, [records, selectedMonth, selectedCategory])
+  const loadMoreRecords = () => {
+    setLoadingMore(true)
+    setPage(prev => prev + 1)
+    loadRecords(false)
+  }
 
-  const handleDelete = (recordId) => {
-    storage.deleteRecord(user.username, recordId)
-    setRecords(prev => prev.filter(r => r.id !== recordId))
-    showToast('记录已删除', 'success')
+  const handleFilterChange = () => {
+    setPage(1)
+    loadRecords(true)
+  }
+
+  const handleMonthChange = (e) => {
+    setSelectedMonth(e.target.value)
+    handleFilterChange()
+  }
+
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value)
+    handleFilterChange()
+  }
+
+  const handleDelete = async (recordId) => {
+    try {
+      await api.deleteRecord(recordId)
+      setRecords(prev => prev.filter(r => r.id !== recordId))
+      showToast('记录已删除', 'success')
+    } catch (err) {
+      showToast('删除失败', 'error')
+    }
     setShowDeleteConfirm(null)
   }
 
-  const groupedRecords = groupRecordsByDate(filteredRecords)
+  const groupedRecords = records.reduce((acc, record) => {
+    const date = record.recordDate.split('T')[0]
+    if (!acc[date]) acc[date] = []
+    acc[date].push(record)
+    return acc
+  }, {})
+
   const sortedDates = Object.keys(groupedRecords).sort((a, b) => new Date(b) - new Date(a))
 
-  // Get current month for default filter
-  const currentMonth = new Date().toISOString().slice(0, 7)
+  const calculateDayTotal = (dayRecords) => {
+    return dayRecords.reduce((sum, r) => sum + Number(r.amount), 0)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <span className="material-symbols-outlined text-4xl text-primary animate-spin">sync</span>
+      </div>
+    )
+  }
 
   return (
     <div className="pb-20 md:pb-8">
@@ -81,7 +168,7 @@ export const Records = () => {
               type="month"
               className="bg-transparent outline-none text-body-secondary cursor-pointer"
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
+              onChange={handleMonthChange}
               max={currentMonth}
             />
           </div>
@@ -96,10 +183,10 @@ export const Records = () => {
             <select
               className="flex items-center px-md py-sm border border-border rounded-lg group-hover:border-primary transition-colors cursor-pointer min-w-[140px] appearance-none bg-surface pr-lg"
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={handleCategoryChange}
             >
               <option value="">全部分类</option>
-              {CATEGORIES.map(cat => (
+              {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.emoji} {cat.name}</option>
               ))}
             </select>
@@ -112,10 +199,7 @@ export const Records = () => {
         {/* Clear Filters */}
         {(selectedMonth || selectedCategory) && (
           <button
-            onClick={() => {
-              setSelectedMonth('')
-              setSelectedCategory('')
-            }}
+            onClick={() => { setSelectedMonth(''); setSelectedCategory(''); handleFilterChange(); }}
             className="px-md py-sm text-text-secondary hover:text-primary transition-colors text-body-secondary"
           >
             清除筛选
@@ -124,7 +208,7 @@ export const Records = () => {
       </div>
 
       {/* Records List */}
-      {filteredRecords.length === 0 ? (
+      {records.length === 0 ? (
         <div className="bg-surface rounded-xl border border-border p-xl text-center">
           <span className="material-symbols-outlined text-6xl text-outline mb-md">receipt_long</span>
           <p className="text-text-secondary mb-md">该筛选条件下没有消费记录</p>
@@ -134,7 +218,7 @@ export const Records = () => {
         <div className="space-y-lg">
           {sortedDates.map(date => {
             const dayRecords = groupedRecords[date]
-            const dayTotal = calculateTotal(dayRecords)
+            const dayTotal = calculateDayTotal(dayRecords)
 
             return (
               <section key={date}>
@@ -145,43 +229,49 @@ export const Records = () => {
                   <span className="font-label-helper text-text-secondary">当日支出: ¥ {dayTotal.toFixed(2)}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-sm">
-                  {dayRecords.map(record => {
-                    const category = getCategoryById(record.category)
-                    return (
-                      <div
-                        key={record.id}
-                        className="bg-surface border border-border rounded-xl p-md flex items-center group transition-all hover:border-primary/30 hover:shadow-md"
-                      >
-                        <div className="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center text-primary mr-md">
-                          <span className="material-symbols-outlined">{category.icon}</span>
-                        </div>
-                        <div className="flex-grow">
-                          <div className="font-body-main font-semibold text-text-primary">
-                            {record.note || category.name}
-                          </div>
-                          <div className="font-label-helper text-text-secondary">
-                            {category.name}
-                          </div>
-                        </div>
-                        <div className="text-right mr-md">
-                          <div className="font-headline-card text-error">- {formatCurrency(record.amount)}</div>
-                          {record.note && (
-                            <div className="font-label-helper text-text-secondary">备注: {record.note}</div>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => setShowDeleteConfirm(record.id)}
-                          className="opacity-0 group-hover:opacity-100 p-sm text-text-secondary hover:text-error transition-all"
-                        >
-                          <span className="material-symbols-outlined">delete</span>
-                        </button>
+                  {dayRecords.map(record => (
+                    <div
+                      key={record.id}
+                      className="bg-surface border border-border rounded-xl p-md flex items-center group transition-all hover:border-primary/30 hover:shadow-md"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center text-primary mr-md">
+                        <span className="text-xl">{record.category?.emoji || '📌'}</span>
                       </div>
-                    )
-                  })}
+                      <div className="flex-grow">
+                        <div className="font-body-main font-semibold text-text-primary">
+                          {record.note || record.category?.name}
+                        </div>
+                        <div className="font-label-helper text-text-secondary">
+                          {record.category?.name}
+                        </div>
+                      </div>
+                      <div className="text-right mr-md">
+                        <div className="font-headline-card text-error">- {formatCurrency(record.amount)}</div>
+                        {record.note && (
+                          <div className="font-label-helper text-text-secondary">备注: {record.note}</div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => setShowDeleteConfirm(record.id)}
+                        className="opacity-0 group-hover:opacity-100 p-sm text-text-secondary hover:text-error transition-all"
+                      >
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </section>
             )
           })}
+
+          {/* Load more trigger */}
+          {hasMore && (
+            <div ref={loadTriggerRef} className="flex justify-center py-lg">
+              {loadingMore && (
+                <span className="material-symbols-outlined text-3xl text-primary animate-spin">sync</span>
+              )}
+            </div>
+          )}
         </div>
       )}
 

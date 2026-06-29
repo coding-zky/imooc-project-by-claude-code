@@ -1,22 +1,35 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
-import { storage, CATEGORIES } from '../utils/storage'
-import { formatDate } from '../utils/format'
+import { api } from '../utils/api'
 
 export const AddRecord = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [categories, setCategories] = useState([])
   const [formData, setFormData] = useState({
     amount: '',
-    category: '',
-    date: formatDate(new Date()),
-    note: ''
+    categoryId: '',
+    recordDate: new Date().toISOString().split('T')[0],
+    note: '',
   })
   const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    loadCategories()
+  }, [])
+
+  const loadCategories = async () => {
+    try {
+      const data = await api.getCategories()
+      setCategories(data)
+    } catch (err) {
+      showToast('加载分类失败', 'error')
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -25,8 +38,8 @@ export const AddRecord = () => {
   }
 
   const handleCategorySelect = (categoryId) => {
-    setFormData(prev => ({ ...prev, category: categoryId }))
-    setErrors(prev => ({ ...prev, category: '' }))
+    setFormData(prev => ({ ...prev, categoryId }))
+    setErrors(prev => ({ ...prev, categoryId: '' }))
   }
 
   const validate = () => {
@@ -34,42 +47,35 @@ export const AddRecord = () => {
     if (!formData.amount || Number(formData.amount) <= 0) {
       newErrors.amount = '请输入有效的消费金额'
     }
-    if (!formData.category) {
-      newErrors.category = '请选择消费分类'
+    if (!formData.categoryId) {
+      newErrors.categoryId = '请选择消费分类'
     }
-    if (!formData.date) {
-      newErrors.date = '请选择消费日期'
+    if (!formData.recordDate) {
+      newErrors.recordDate = '请选择消费日期'
     }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validate()) return
 
     setLoading(true)
     try {
-      storage.saveRecord(user.username, {
+      await api.createRecord({
         amount: Number(formData.amount),
-        category: formData.category,
-        date: formData.date,
-        note: formData.note
+        categoryId: formData.categoryId,
+        recordDate: formData.recordDate,
+        note: formData.note,
       })
       showToast('账目已保存成功', 'success')
-      setFormData({
-        amount: '',
-        category: '',
-        date: formatDate(new Date()),
-        note: ''
-      })
-      setTimeout(() => {
-        navigate('/')
-      }, 1500)
-    } catch (error) {
-      showToast('保存失败，请重试', 'error')
+      setTimeout(() => navigate('/'), 1500)
+    } catch (err) {
+      showToast(err.message || '保存失败，请重试', 'error')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const handleCancel = () => {
@@ -118,14 +124,14 @@ export const AddRecord = () => {
               消费类别
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-sm">
-              {CATEGORIES.slice(0, 6).map((cat) => (
+              {categories.slice(0, 6).map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
-                  onClick={() => handleCategorySelect(cat.id)}
+                  onClick={() => handleCategorySelect(cat.id.toString())}
                   className={`
                     flex items-center gap-xs p-sm border rounded-lg transition-all active:scale-95 text-body-secondary
-                    ${formData.category === cat.id
+                    ${formData.categoryId === cat.id.toString()
                       ? 'bg-primary-container text-on-primary-container border-primary'
                       : 'border-border hover:bg-surface-container-low'
                     }
@@ -140,14 +146,14 @@ export const AddRecord = () => {
             <div className="relative">
               <select
                 className={`w-full p-sm rounded-lg border text-body-secondary appearance-none cursor-pointer ${
-                  errors.category ? 'border-error' : 'border-border focus:border-primary'
-                } ${formData.category ? 'text-text-primary' : ''}`}
-                name="category"
-                value={formData.category}
+                  errors.categoryId ? 'border-error' : 'border-border focus:border-primary'
+                } ${formData.categoryId ? 'text-text-primary' : ''}`}
+                name="categoryId"
+                value={formData.categoryId}
                 onChange={handleChange}
               >
                 <option value="">选择更多分类...</option>
-                {CATEGORIES.slice(6).map((cat) => (
+                {categories.slice(6).map((cat) => (
                   <option key={cat.id} value={cat.id}>{cat.emoji} {cat.name}</option>
                 ))}
               </select>
@@ -155,8 +161,8 @@ export const AddRecord = () => {
                 expand_more
               </span>
             </div>
-            {errors.category && (
-              <p className="text-error text-xs">{errors.category}</p>
+            {errors.categoryId && (
+              <p className="text-error text-xs">{errors.categoryId}</p>
             )}
           </div>
 
@@ -169,16 +175,16 @@ export const AddRecord = () => {
               <div className="relative">
                 <input
                   className={`w-full p-sm rounded-lg border text-body-secondary ${
-                    errors.date ? 'border-error' : 'border-border focus:border-primary'
+                    errors.recordDate ? 'border-error' : 'border-border focus:border-primary'
                   }`}
                   type="date"
-                  name="date"
-                  value={formData.date}
+                  name="recordDate"
+                  value={formData.recordDate}
                   onChange={handleChange}
                 />
               </div>
-              {errors.date && (
-                <p className="text-error text-xs">{errors.date}</p>
+              {errors.recordDate && (
+                <p className="text-error text-xs">{errors.recordDate}</p>
               )}
             </div>
             <div className="space-y-sm">
@@ -226,7 +232,7 @@ export const AddRecord = () => {
         </div>
         <div className="p-sm bg-secondary/5 rounded-lg border border-secondary/10 flex items-start gap-sm">
           <span className="material-symbols-outlined text-secondary text-lg">shield</span>
-          <p className="text-body-secondary text-on-secondary-fixed-variant leading-tight text-sm">安全：您的数据已进行本地加密存储。</p>
+          <p className="text-body-secondary text-on-secondary-fixed-variant leading-tight text-sm">安全：您的数据已进行加密存储。</p>
         </div>
       </div>
     </div>

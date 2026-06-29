@@ -1,106 +1,95 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { storage, getCategoryById } from '../utils/storage'
-import { formatCurrency, formatDate, calculateTotal, calculateCategoryBreakdown } from '../utils/format'
+import { useToast } from '../context/ToastContext'
+import { api } from '../utils/api'
+import { formatCurrency } from '../utils/format'
+
+const COLORS = ['#2563EB', '#006c49', '#784b00', '#EF4444', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981', '#6366F1', '#64748B']
 
 export const Stats = () => {
   const { user } = useAuth()
-  const [records, setRecords] = useState([])
-  const [timeRange, setTimeRange] = useState('7') // '7', '30', 'custom'
-  const [filteredRecords, setFilteredRecords] = useState([])
+  const { showToast } = useToast()
+  const [timeRange, setTimeRange] = useState('7')
+  const [stats, setStats] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
-    if (user?.username) {
-      const allRecords = storage.getRecords(user.username)
-      setRecords(allRecords)
-      filterRecords(allRecords, timeRange)
+    loadStats()
+  }, [timeRange])
+
+  const loadStats = async () => {
+    setLoading(true)
+    try {
+      const data = await api.getStats(parseInt(timeRange))
+      setStats(data)
+    } catch (err) {
+      showToast('加载统计数据失败', 'error')
+    } finally {
+      setLoading(false)
     }
-  }, [user])
-
-  useEffect(() => {
-    filterRecords(records, timeRange)
-  }, [timeRange, records])
-
-  const filterRecords = (allRecords, range) => {
-    const now = new Date()
-    let startDate = new Date()
-
-    if (range === '7') {
-      startDate.setDate(now.getDate() - 7)
-    } else if (range === '30') {
-      startDate.setDate(now.getDate() - 30)
-    } else {
-      startDate = new Date(0) // All time
-    }
-
-    const filtered = allRecords.filter(r => new Date(r.date) >= startDate)
-    setFilteredRecords(filtered)
   }
 
-  const totalAmount = calculateTotal(filteredRecords)
-  const avgDaily = filteredRecords.length > 0 ? totalAmount / (timeRange === '7' ? 7 : timeRange === '30' ? 30 : 30) : 0
-  const maxRecord = filteredRecords.length > 0
-    ? filteredRecords.reduce((max, r) => Number(r.amount) > Number(max.amount) ? r : max, filteredRecords[0])
-    : null
-
-  const categoryBreakdown = calculateCategoryBreakdown(filteredRecords)
-  const sortedCategories = Object.entries(categoryBreakdown)
-    .map(([category, amount]) => ({
-      category: getCategoryById(category),
-      amount,
-      percentage: totalAmount > 0 ? Math.round((amount / totalAmount) * 100) : 0
-    }))
-    .sort((a, b) => b.amount - a.amount)
-
-  // Get daily data for chart
-  const getDailyData = () => {
-    const days = timeRange === '7' ? 7 : 30
-    const data = []
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date()
-      date.setDate(date.getDate() - i)
-      const dateStr = formatDate(date)
-      const dayRecords = filteredRecords.filter(r => r.date === dateStr)
-      const total = calculateTotal(dayRecords)
-      data.push({
-        date: dateStr,
-        label: `${date.getMonth() + 1}/${date.getDate()}`,
-        amount: total
-      })
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      await api.exportExcel(parseInt(timeRange))
+      showToast('Excel 导出成功', 'success')
+    } catch (err) {
+      showToast('导出失败', 'error')
+    } finally {
+      setExporting(false)
     }
-    return data
   }
 
-  const dailyData = getDailyData()
-  const maxAmount = Math.max(...dailyData.map(d => d.amount), 1)
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <span className="material-symbols-outlined text-4xl text-primary animate-spin">sync</span>
+      </div>
+    )
+  }
 
-  const COLORS = ['#2563EB', '#006c49', '#784b00', '#EF4444', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981', '#6366F1', '#64748B']
+  const totalAmount = stats?.totalAmount || 0
+  const avgDaily = stats?.avgDaily || 0
+  const maxRecord = stats?.categoryData?.[0]
 
   return (
     <div className="pb-20 md:pb-8">
       {/* Header */}
-      <div className="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-md">
+      <div className="mb-lg flex flex-col md:flex-row md:items-end md:justify-between gap-md">
         <div>
           <h1 className="font-display-title text-display-title mb-xs">统计报表</h1>
           <p className="text-text-secondary font-body-secondary">洞察您的消费习惯，优化财务结构</p>
         </div>
-        {/* Time Range Selector */}
-        <div className="flex items-center bg-surface border border-border rounded-lg p-1">
+        <div className="flex items-center gap-md">
+          {/* Time Range Selector */}
+          <div className="flex items-center bg-surface border border-border rounded-lg p-1">
+            <button
+              onClick={() => setTimeRange('7')}
+              className={`px-md py-xs rounded-md text-sm font-medium transition-all ${
+                timeRange === '7' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:bg-surface-container-low'
+              }`}
+            >
+              最近7天
+            </button>
+            <button
+              onClick={() => setTimeRange('30')}
+              className={`px-md py-xs rounded-md text-sm font-medium transition-all ${
+                timeRange === '30' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:bg-surface-container-low'
+              }`}
+            >
+              最近30天
+            </button>
+          </div>
+          {/* Export Button */}
           <button
-            onClick={() => setTimeRange('7')}
-            className={`px-md py-xs rounded-md text-sm font-medium transition-all ${
-              timeRange === '7' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:bg-surface-container-low'
-            }`}
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex items-center gap-xs px-md py-xs bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover transition-all disabled:opacity-50"
           >
-            最近7天
-          </button>
-          <button
-            onClick={() => setTimeRange('30')}
-            className={`px-md py-xs rounded-md text-sm font-medium transition-all ${
-              timeRange === '30' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:bg-surface-container-low'
-            }`}
-          >
-            最近30天
+            <span className="material-symbols-outlined text-lg">{exporting ? 'sync' : 'download'}</span>
+            {exporting ? '导出中...' : '导出Excel'}
           </button>
         </div>
       </div>
@@ -119,8 +108,10 @@ export const Stats = () => {
               <span className="font-semibold text-text-primary">¥ {avgDaily.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-text-secondary text-sm">单笔最高</span>
-              <span className="font-semibold text-error">¥ {maxRecord?.amount?.toFixed(2) || '0.00'}</span>
+              <span className="text-text-secondary text-sm">最高分类</span>
+              <span className="font-semibold text-error">
+                {maxRecord ? `${maxRecord.emoji} ¥${maxRecord.amount.toFixed(2)}` : '¥0.00'}
+              </span>
             </div>
           </div>
         </div>
@@ -132,20 +123,20 @@ export const Stats = () => {
           </div>
           <div className="h-48 flex items-end justify-between px-md relative">
             <div className="absolute inset-0 flex items-end justify-between px-lg pb-8 border-b border-dashed border-border">
-              {dailyData.filter((_, i) => i % Math.ceil(dailyData.length / 7) === 0).map((day, i) => (
+              {stats?.dailyData?.filter((_, i) => i % Math.ceil((stats.dailyData?.length || 1) / 7) === 0).map((day, i) => (
                 <div
                   key={i}
                   className="w-12 bg-primary/20 rounded-t-lg relative group transition-all hover:bg-primary/40"
-                  style={{ height: `${(day.amount / maxAmount) * 100}%`, minHeight: day.amount > 0 ? '8px' : '4px' }}
+                  style={{ height: `${totalAmount > 0 ? (day.amount / Math.max(...(stats.dailyData?.map(d => d.amount) || [1]), 1)) * 100 : 0}%`, minHeight: day.amount > 0 ? '8px' : '4px' }}
                 >
-                  <div className="hidden group-hover:block absolute -top-6 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded whitespace-nowrap">
+                  <div className="hidden group-hover:block absolute -top-6 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-10">
                     ¥{day.amount.toFixed(0)}
                   </div>
                 </div>
               ))}
             </div>
             <div className="absolute bottom-0 left-0 w-full flex justify-between px-lg text-label-helper text-text-secondary">
-              {dailyData.filter((_, i) => i % Math.ceil(dailyData.length / 7) === 0).map((day, i) => (
+              {stats?.dailyData?.filter((_, i) => i % Math.ceil((stats.dailyData?.length || 1) / 7) === 0).map((day, i) => (
                 <span key={i}>{day.label}</span>
               ))}
             </div>
@@ -162,15 +153,15 @@ export const Stats = () => {
             <div className="relative w-40 h-40 mb-lg">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                 <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#E5E7EB" strokeWidth="3" />
-                {totalAmount > 0 ? sortedCategories.reduce((acc, cat, i) => {
+                {totalAmount > 0 && stats?.categoryData ? stats.categoryData.reduce((acc, cat, i) => {
                   const percentage = (cat.amount / totalAmount) * 100
                   const offset = acc.reduce((sum, _, j) => {
-                    return sum + ((sortedCategories[j].amount / totalAmount) * 100)
+                    return sum + ((stats.categoryData[j].amount / totalAmount) * 100)
                   }, 0)
                   if (percentage > 0) {
                     acc.push(
                       <circle
-                        key={cat.category.id}
+                        key={cat.categoryId}
                         cx="18"
                         cy="18"
                         fill="transparent"
@@ -194,14 +185,14 @@ export const Stats = () => {
             </div>
             {/* Legend */}
             <div className="w-full space-y-sm">
-              {sortedCategories.slice(0, 5).map((cat, i) => (
-                <div key={cat.category.id} className="flex items-center justify-between">
+              {stats?.categoryData?.slice(0, 5).map((cat, i) => (
+                <div key={cat.categoryId} className="flex items-center justify-between">
                   <div className="flex items-center gap-sm">
                     <span
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: COLORS[i % COLORS.length] }}
                     />
-                    <span className="text-body-secondary">{cat.category.emoji} {cat.category.name}</span>
+                    <span className="text-body-secondary">{cat.emoji} {cat.name}</span>
                   </div>
                   <div className="flex items-center gap-md">
                     <span className="text-body-secondary">¥{cat.amount.toFixed(2)}</span>
@@ -217,14 +208,14 @@ export const Stats = () => {
         <div className="bg-surface border border-border rounded-xl p-lg">
           <h3 className="font-headline-card text-headline-card mb-lg">分类金额排名</h3>
           <div className="space-y-md">
-            {sortedCategories.map((cat, i) => (
-              <div key={cat.category.id} className="space-y-xs">
+            {stats?.categoryData?.map((cat, i) => (
+              <div key={cat.categoryId} className="space-y-xs">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-sm">
                     <span className="w-5 h-5 rounded-full bg-surface-container flex items-center justify-center text-xs font-semibold text-text-secondary">
                       {i + 1}
                     </span>
-                    <span className="text-body-secondary">{cat.category.emoji} {cat.category.name}</span>
+                    <span className="text-body-secondary">{cat.emoji} {cat.name}</span>
                   </div>
                   <span className="font-semibold text-text-primary">¥{cat.amount.toFixed(2)}</span>
                 </div>
@@ -233,7 +224,7 @@ export const Stats = () => {
                     className="h-full rounded-full transition-all duration-500"
                     style={{
                       width: `${totalAmount > 0 ? (cat.amount / totalAmount) * 100 : 0}%`,
-                      backgroundColor: COLORS[i % COLORS.length]
+                      backgroundColor: COLORS[i % COLORS.length],
                     }}
                   />
                 </div>

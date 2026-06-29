@@ -76,6 +76,43 @@ class ApiService {
     return this.request('/users/profile')
   }
 
+  async updateProfile(data) {
+    return this.request('/users/profile', {
+      method: 'PUT',
+      body: data,
+    })
+  }
+
+  async changePassword(oldPassword, newPassword) {
+    return this.request('/users/password', {
+      method: 'PUT',
+      body: { oldPassword, newPassword },
+    })
+  }
+
+  async bindPhone(phone, code) {
+    return this.request('/users/phone', {
+      method: 'PUT',
+      body: { phone, code },
+    })
+  }
+
+  async getPreferences() {
+    return this.request('/users/preferences')
+  }
+
+  async updatePreferences(data) {
+    return this.request('/users/preferences', {
+      method: 'PUT',
+      body: data,
+    })
+  }
+
+  // Categories API
+  async getCategories() {
+    return this.request('/categories')
+  }
+
   // Records APIs
   async getRecords(params = {}) {
     const query = new URLSearchParams(params).toString()
@@ -100,6 +137,35 @@ class ApiService {
     return this.request(`/records/${id}`, {
       method: 'DELETE',
     })
+  }
+
+  // Stats APIs
+  async getStats(days = 7) {
+    return this.request(`/stats?days=${days}`)
+  }
+
+  async exportExcel(days = 7) {
+    const token = this.getToken()
+    const response = await fetch(`${this.baseUrl}/stats/export?days=${days}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error('导出失败')
+    }
+
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `轻账本统计报表_${days}天_${new Date().toISOString().split('T')[0]}.xlsx`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(url)
   }
 }
 
