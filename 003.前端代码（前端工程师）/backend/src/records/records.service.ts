@@ -1,6 +1,24 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
+import { Decimal } from '@prisma/client/runtime/library'
 import { CreateRecordDto, UpdateRecordDto, QueryRecordsDto } from './dto/records.dto'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const serialize = (obj: any): any => {
+  if (obj === null || obj === undefined) return obj
+  if (typeof obj === 'bigint') return Number(obj)
+  if (obj instanceof Decimal) return Number(obj.toString())
+  if (obj instanceof Date) return obj.toISOString()
+  if (Array.isArray(obj)) return obj.map(serialize)
+  if (typeof obj === 'object') {
+    const result: any = {}
+    for (const key of Object.keys(obj)) {
+      result[key] = serialize(obj[key])
+    }
+    return result
+  }
+  return obj
+}
 
 @Injectable()
 export class RecordsService {
@@ -30,11 +48,7 @@ export class RecordsService {
       },
     })
 
-    return {
-      ...record,
-      categoryId: record.categoryId.toString(),
-      userId: record.userId.toString(),
-    }
+    return serialize(record)
   }
 
   async findAll(userId: bigint, query: QueryRecordsDto) {
@@ -47,11 +61,12 @@ export class RecordsService {
 
     if (month) {
       const [year, m] = month.split('-')
-      const start = new Date(parseInt(year), parseInt(m) - 1, 1)
-      const end = new Date(parseInt(year), parseInt(m), 0)
+      // Use UTC dates to avoid timezone mismatch with MySQL
+      const startDate = new Date(Date.UTC(parseInt(year), parseInt(m) - 1, 1, 0, 0, 0, 0))
+      const endDate = new Date(Date.UTC(parseInt(year), parseInt(m), 0, 23, 59, 59, 999))
       where.recordDate = {
-        gte: start,
-        lte: end,
+        gte: startDate,
+        lte: endDate,
       }
     }
 
@@ -87,16 +102,12 @@ export class RecordsService {
     ])
 
     return {
-      records: records.map(r => ({
-        ...r,
-        categoryId: r.categoryId.toString(),
-        userId: r.userId.toString(),
-      })),
+      records: records.map(r => serialize(r)),
       pagination: {
         page,
         pageSize,
-        total,
-        totalPages: Math.ceil(total / pageSize),
+        total: Number(total),
+        totalPages: Math.ceil(Number(total) / pageSize),
       },
     }
   }
@@ -115,11 +126,7 @@ export class RecordsService {
       throw new ForbiddenException('无权访问此记录')
     }
 
-    return {
-      ...record,
-      categoryId: record.categoryId.toString(),
-      userId: record.userId.toString(),
-    }
+    return serialize(record)
   }
 
   async update(userId: bigint, id: string, dto: UpdateRecordDto) {
@@ -147,11 +154,7 @@ export class RecordsService {
       include: { category: true },
     })
 
-    return {
-      ...updated,
-      categoryId: updated.categoryId.toString(),
-      userId: updated.userId.toString(),
-    }
+    return serialize(updated)
   }
 
   async remove(userId: bigint, id: string) {

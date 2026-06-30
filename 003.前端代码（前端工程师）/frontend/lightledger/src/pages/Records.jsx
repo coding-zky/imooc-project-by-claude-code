@@ -25,7 +25,7 @@ export const Records = () => {
 
   useEffect(() => {
     loadCategories()
-    loadRecords(true)
+    loadRecords(true, 1)
   }, [])
 
   useEffect(() => {
@@ -54,15 +54,15 @@ export const Records = () => {
     }
   }
 
-  const loadRecords = async (reset = false) => {
+  // reset=true: 重新加载第1页；reset=false: 加载指定页
+  const loadRecords = async (reset = false, targetPage = 1) => {
     if (reset) {
       setLoading(true)
-      setPage(1)
     }
 
     try {
       const params = {
-        page: reset ? 1 : page,
+        page: targetPage,
         pageSize,
         sortBy: 'recordDate',
         sortOrder: 'desc',
@@ -71,12 +71,13 @@ export const Records = () => {
       if (selectedCategory) params.categoryId = selectedCategory
 
       const data = await api.getRecords(params)
-      if (reset) {
+      if (reset || targetPage === 1) {
         setRecords(data.records || [])
       } else {
         setRecords(prev => [...prev, ...(data.records || [])])
       }
       setHasMore(data.pagination?.page < data.pagination?.totalPages)
+      setPage(targetPage)
     } catch (err) {
       showToast('加载记录失败', 'error')
     } finally {
@@ -87,13 +88,11 @@ export const Records = () => {
 
   const loadMoreRecords = () => {
     setLoadingMore(true)
-    setPage(prev => prev + 1)
-    loadRecords(false)
+    loadRecords(false, page + 1)
   }
 
   const handleFilterChange = () => {
-    setPage(1)
-    loadRecords(true)
+    loadRecords(true, 1)
   }
 
   const handleMonthChange = (e) => {
@@ -110,6 +109,7 @@ export const Records = () => {
     try {
       await api.deleteRecord(recordId)
       setRecords(prev => prev.filter(r => r.id !== recordId))
+      window.dispatchEvent(new Event('record-added'))
       showToast('记录已删除', 'success')
     } catch (err) {
       showToast('删除失败', 'error')

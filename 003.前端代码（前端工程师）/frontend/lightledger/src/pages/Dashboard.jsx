@@ -18,6 +18,9 @@ export const Dashboard = () => {
 
   useEffect(() => {
     loadData()
+    const handleRecordAdded = () => loadData()
+    window.addEventListener('record-added', handleRecordAdded)
+    return () => window.removeEventListener('record-added', handleRecordAdded)
   }, [user])
 
   const loadData = async () => {
@@ -27,26 +30,27 @@ export const Dashboard = () => {
       const now = new Date()
       const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 
-      // Fetch stats (7 days) and recent records in parallel
-      const [statsData, recordsData] = await Promise.all([
+      // Fetch stats (7 days), recent 3 records, and all month records for total in parallel
+      const [statsData, recentData, monthData] = await Promise.all([
         api.getStats(7).catch(() => null),
         api.getRecords({ month: currentMonth, pageSize: 3 }).catch(() => ({ records: [] })),
+        api.getRecords({ month: currentMonth, pageSize: 500 }).catch(() => ({ records: [] })),
       ])
 
       setStats(statsData)
-      setRecords(recordsData.records || [])
+      setRecords(recentData.records || [])
 
-      // Calculate month total from records
-      if (recordsData.records) {
-        const total = recordsData.records.reduce((sum, r) => sum + Number(r.amount), 0)
+      // Calculate month total from ALL month records
+      if (monthData.records) {
+        const total = monthData.records.reduce((sum, r) => sum + Number(r.amount), 0)
         setMonthTotal(total)
       }
 
       // Calculate today total from stats daily data
       if (statsData?.dailyData) {
-        const today = now.toISOString().split('T')[0]
-        const todayData = statsData.dailyData.find(d => d.date === today)
-        setTodayTotal(todayData ? todayData.amount : 0)
+        const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+        const todayData = statsData.dailyData.find(d => d.date === todayLocal)
+        setTodayTotal(todayData ? Number(todayData.amount) : 0)
       }
     } catch (err) {
       showToast('加载数据失败', 'error')
@@ -80,7 +84,10 @@ export const Dashboard = () => {
   const maxAmount = Math.max(...last7Days.map(d => d.amount), 1)
 
   const getRelativeTime = (dateStr) => {
-    const date = new Date(dateStr)
+    if (!dateStr) return '未知'
+    const dateStrClean = dateStr.split('T')[0]
+    const date = new Date(dateStrClean)
+    if (isNaN(date.getTime())) return '未知'
     const now = new Date()
     const diffMs = now - date
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
@@ -263,7 +270,7 @@ export const Dashboard = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-body-main font-bold text-text-primary">- {formatCurrency(record.amount)}</p>
+                  <p className="font-body-main font-bold text-error">- {formatCurrency(record.amount)}</p>
                 </div>
               </div>
             ))}

@@ -110,7 +110,7 @@ export const Stats = () => {
             <div className="flex justify-between items-center">
               <span className="text-text-secondary text-sm">最高分类</span>
               <span className="font-semibold text-error">
-                {maxRecord ? `${maxRecord.emoji} ¥${maxRecord.amount.toFixed(2)}` : '¥0.00'}
+                {maxRecord ? `${maxRecord.emoji} ¥${Number(maxRecord.amount).toFixed(2)}` : '¥0.00'}
               </span>
             </div>
           </div>
@@ -123,20 +123,20 @@ export const Stats = () => {
           </div>
           <div className="h-48 flex items-end justify-between px-md relative">
             <div className="absolute inset-0 flex items-end justify-between px-lg pb-8 border-b border-dashed border-border">
-              {stats?.dailyData?.filter((_, i) => i % Math.ceil((stats.dailyData?.length || 1) / 7) === 0).map((day, i) => (
+              {(stats?.dailyData || []).map((day, i) => (
                 <div
                   key={i}
                   className="w-12 bg-primary/20 rounded-t-lg relative group transition-all hover:bg-primary/40"
-                  style={{ height: `${totalAmount > 0 ? (day.amount / Math.max(...(stats.dailyData?.map(d => d.amount) || [1]), 1)) * 100 : 0}%`, minHeight: day.amount > 0 ? '8px' : '4px' }}
+                  style={{ height: `${totalAmount > 0 ? (Number(day.amount) / Math.max(...(stats.dailyData?.map(d => Number(d.amount)) || [1]), 1)) * 100 : 0}%`, minHeight: Number(day.amount) > 0 ? '8px' : '4px' }}
                 >
                   <div className="hidden group-hover:block absolute -top-6 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-10">
-                    ¥{day.amount.toFixed(0)}
+                    ¥{Number(day.amount).toFixed(0)}
                   </div>
                 </div>
               ))}
             </div>
             <div className="absolute bottom-0 left-0 w-full flex justify-between px-lg text-label-helper text-text-secondary">
-              {stats?.dailyData?.filter((_, i) => i % Math.ceil((stats.dailyData?.length || 1) / 7) === 0).map((day, i) => (
+              {(stats?.dailyData || []).map((day, i) => (
                 <span key={i}>{day.label}</span>
               ))}
             </div>
@@ -154,9 +154,9 @@ export const Stats = () => {
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                 <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#E5E7EB" strokeWidth="3" />
                 {totalAmount > 0 && stats?.categoryData ? stats.categoryData.reduce((acc, cat, i) => {
-                  const percentage = (cat.amount / totalAmount) * 100
+                  const percentage = (Number(cat.amount) / totalAmount) * 100
                   const offset = acc.reduce((sum, _, j) => {
-                    return sum + ((stats.categoryData[j].amount / totalAmount) * 100)
+                    return sum + ((Number(stats.categoryData[j].amount) / totalAmount) * 100)
                   }, 0)
                   if (percentage > 0) {
                     acc.push(
@@ -195,7 +195,7 @@ export const Stats = () => {
                     <span className="text-body-secondary">{cat.emoji} {cat.name}</span>
                   </div>
                   <div className="flex items-center gap-md">
-                    <span className="text-body-secondary">¥{cat.amount.toFixed(2)}</span>
+                    <span className="text-body-secondary">¥{Number(cat.amount).toFixed(2)}</span>
                     <span className="text-body-secondary font-semibold w-10 text-right">{cat.percentage}%</span>
                   </div>
                 </div>
@@ -217,13 +217,13 @@ export const Stats = () => {
                     </span>
                     <span className="text-body-secondary">{cat.emoji} {cat.name}</span>
                   </div>
-                  <span className="font-semibold text-text-primary">¥{cat.amount.toFixed(2)}</span>
+                  <span className="font-semibold text-text-primary">¥{Number(cat.amount).toFixed(2)}</span>
                 </div>
                 <div className="h-2 bg-surface-container rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{
-                      width: `${totalAmount > 0 ? (cat.amount / totalAmount) * 100 : 0}%`,
+                      width: `${totalAmount > 0 ? (Number(cat.amount) / totalAmount) * 100 : 0}%`,
                       backgroundColor: COLORS[i % COLORS.length],
                     }}
                   />

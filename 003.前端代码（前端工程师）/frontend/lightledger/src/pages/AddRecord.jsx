@@ -70,6 +70,7 @@ export const AddRecord = () => {
         note: formData.note,
       })
       showToast('账目已保存成功', 'success')
+      window.dispatchEvent(new Event('record-added'))
       setTimeout(() => navigate('/'), 1500)
     } catch (err) {
       showToast(err.message || '保存失败，请重试', 'error')
