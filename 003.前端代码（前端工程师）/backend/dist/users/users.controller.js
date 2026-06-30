@@ -15,27 +15,82 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersController = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
+const user_dto_1 = require("./dto/user.dto");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
         this.usersService = usersService;
     }
-    async getProfile(req) {
+    getProfile(req) {
         return this.usersService.findById(req.user.id);
+    }
+    updateProfile(req, dto) {
+        return this.usersService.updateProfile(req.user.id, dto);
+    }
+    changePassword(req, dto) {
+        return this.usersService.changePassword(req.user.id, dto);
+    }
+    bindPhone(req, dto) {
+        return this.usersService.bindPhone(req.user.id, dto);
+    }
+    getPreferences(req) {
+        return this.usersService.getPreferences(req.user.id);
+    }
+    updatePreferences(req, dto) {
+        return this.usersService.updatePreferences(req.user.id, dto);
     }
 };
 exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Get)('profile'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], UsersController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Put)('profile'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, user_dto_1.UpdateProfileDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updateProfile", null);
+__decorate([
+    (0, common_1.Put)('password'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, user_dto_1.ChangePasswordDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "changePassword", null);
+__decorate([
+    (0, common_1.Put)('phone'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, user_dto_1.BindPhoneDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "bindPhone", null);
+__decorate([
+    (0, common_1.Get)('preferences'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getPreferences", null);
+__decorate([
+    (0, common_1.Put)('preferences'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, user_dto_1.UpdatePreferencesDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updatePreferences", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map

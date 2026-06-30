@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:3001'
+// Java 后端端口
+const API_BASE_URL = 'http://localhost:8080'
 
 class ApiService {
   constructor() {
@@ -36,13 +37,16 @@ class ApiService {
 
     try {
       const response = await fetch(url, config)
-      const data = await response.json()
+      const result = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.message || data.response?.message || '请求失败')
+      // Java 后端返回格式：{ code, message, data }
+      // 抛出后端返回的错误信息
+      if (!response.ok || result.code !== 200) {
+        throw new Error(result.message || result.response?.message || '请求失败')
       }
 
-      return data
+      // 返回 data 字段内容
+      return result
     } catch (error) {
       throw error
     }
@@ -50,59 +54,66 @@ class ApiService {
 
   // Auth APIs
   async register(username, password, email = null) {
-    const data = await this.request('/auth/register', {
+    const result = await this.request('/api/auth/register', {
       method: 'POST',
       body: { username, password, email },
     })
-    if (data.token) {
+    // Java 后端返回 { code, message, data: { token, userId, username } }
+    const data = result.data
+    if (data && data.token) {
       this.setToken(data.token)
     }
-    return data
+    // 返回带 user 属性的对象，兼容前端
+    return { user: data }
   }
 
   async login(username, password) {
-    const data = await this.request('/auth/login', {
+    const result = await this.request('/api/auth/login', {
       method: 'POST',
       body: { username, password },
     })
-    if (data.token) {
+    const data = result.data
+    if (data && data.token) {
       this.setToken(data.token)
     }
-    return data
+    // 返回带 user 属性的对象，兼容前端
+    return { user: data }
   }
 
   // User APIs
   async getProfile() {
-    return this.request('/users/profile')
+    const result = await this.request('/api/users/profile')
+    return result.data
   }
 
   async updateProfile(data) {
-    return this.request('/users/profile', {
+    return this.request('/api/users/profile', {
       method: 'PUT',
       body: data,
     })
   }
 
   async changePassword(oldPassword, newPassword) {
-    return this.request('/users/password', {
+    return this.request('/api/users/password', {
       method: 'PUT',
       body: { oldPassword, newPassword },
     })
   }
 
   async bindPhone(phone, code) {
-    return this.request('/users/phone', {
-      method: 'PUT',
+    return this.request('/api/users/phone', {
+      method: 'POST',
       body: { phone, code },
     })
   }
 
   async getPreferences() {
-    return this.request('/users/preferences')
+    const result = await this.request('/api/users/preferences')
+    return result.data
   }
 
   async updatePreferences(data) {
-    return this.request('/users/preferences', {
+    return this.request('/api/users/preferences', {
       method: 'PUT',
       body: data,
     })
@@ -110,43 +121,46 @@ class ApiService {
 
   // Categories API
   async getCategories() {
-    return this.request('/categories')
+    const result = await this.request('/api/categories')
+    return result.data || []
   }
 
   // Records APIs
   async getRecords(params = {}) {
     const query = new URLSearchParams(params).toString()
-    return this.request(`/records${query ? `?${query}` : ''}`)
+    const result = await this.request(`/api/records${query ? `?${query}` : ''}`)
+    return result.data
   }
 
   async createRecord(data) {
-    return this.request('/records', {
+    return this.request('/api/records', {
       method: 'POST',
       body: data,
     })
   }
 
   async updateRecord(id, data) {
-    return this.request(`/records/${id}`, {
+    return this.request(`/api/records/${id}`, {
       method: 'PUT',
       body: data,
     })
   }
 
   async deleteRecord(id) {
-    return this.request(`/records/${id}`, {
+    return this.request(`/api/records/${id}`, {
       method: 'DELETE',
     })
   }
 
   // Stats APIs
   async getStats(days = 7) {
-    return this.request(`/stats?days=${days}`)
+    const result = await this.request(`/api/stats?days=${days}`)
+    return result.data
   }
 
   async exportExcel(days = 7) {
     const token = this.getToken()
-    const response = await fetch(`${this.baseUrl}/stats/export?days=${days}`, {
+    const response = await fetch(`${this.baseUrl}/api/stats/export?days=${days}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
